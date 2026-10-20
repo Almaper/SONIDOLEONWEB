@@ -5,10 +5,8 @@
     {
       "published": true,
       "h1": "Videomapping navideño en Comillas",
-      "slug": "videomapping-navidad-comillas",
       "category": "Videomapping",
       "image": "/images/proyectos/comillas.jpg",
-      "gallery": [],
       "description": [
         "En la Navidad de 2025, la fachada de la iglesia de San Cristóbal de Comillas se convirtió en un espacio escénico de luz y sonido. La propuesta, impulsada por el Plan de Sostenibilidad Turística de Comillas, recorre la historia y el legado cultural de la villa dentro de una ambientación navideña.",
         "La intervención pone en valor el patrimonio arquitectónico del entorno y hace del centro de la villa un punto de encuentro durante las fiestas."
@@ -35,16 +33,15 @@
         "text": "Un espectáculo que dinamiza el centro de Comillas en Navidad y acerca su patrimonio a vecinos y visitantes."
       },
       "cta": "¿Quieres un videomapping para tu municipio o tu evento? Cuéntanos tu idea y la preparamos contigo.",
+      "slug": "videomapping-navidad-comillas",
       "seoTitle": "Videomapping navideño en Comillas | Sonido León",
       "metaDescription": "Videomapping de Navidad sobre la fachada de la iglesia de San Cristóbal de Comillas, dentro del Plan de Sostenibilidad Turística. Producción técnica de Sonido León."
     },
     {
       "published": true,
       "h1": "«Historia de la Navidad» en Castro Urdiales",
-      "slug": "videomapping-navidad-castro-urdiales",
       "category": "Videomapping",
       "image": "/images/proyectos/castro-urdiales.jpg",
-      "gallery": [],
       "description": [
         "«Historia de la Navidad» es el videomapping navideño que Sonido León proyectó sobre la iglesia de Santa María de la Asunción de Castro Urdiales en la Navidad de 2024 y que volvió en la de 2025.",
         "Durante más de un mes, la fachada gótica de la iglesia sirvió de pantalla para contar la historia de la Navidad con luz, imagen y sonido."
@@ -69,19 +66,18 @@
         "text": "Una acogida que llevó a repetir el espectáculo al año siguiente."
       },
       "cta": "¿Quieres un videomapping para tu municipio o tu evento? Cuéntanos tu idea y la preparamos contigo.",
+      "slug": "videomapping-navidad-castro-urdiales",
       "seoTitle": "«Historia de la Navidad», videomapping en Castro Urdiales | Sonido León",
       "metaDescription": "«Historia de la Navidad»: videomapping navideño sobre la iglesia de Santa María de la Asunción de Castro Urdiales en 2024 y 2025. Producción de Sonido León."
     },
     {
       "published": true,
       "h1": "Videomapping navideño en Santillana del Mar",
-      "slug": "videomapping-navidad-santillana-del-mar",
       "category": "Videomapping",
       "image": "/images/proyectos/santillana-2025.jpg",
-      "gallery": [],
       "description": [
         "Desde la Navidad de 2022, Sonido León produce el videomapping navideño de Santillana del Mar junto a su ayuntamiento. Cada año, una historia nueva sobre las fachadas del casco histórico.",
-        "La edición de 2022, «Santillana, origen y destino», llegó a presentarse en FITUR. Le siguieron «Santillana del Mar, Luz y Magia» en 2023, «El origen de la Magia» en 2024 y, en 2025, dos propuestas con actores en directo."
+        "La edición de 2022, «Santillana, origen y destino», llegó a presentarse en FITUR. Le siguieron «Santillana del Mar, Luz y Magia» en 2023, «El origen de la Magia» en 2024 y, en 2025, se realizo la impresionante «In Nomine Lux»"
       ],
       "characteristics": {
         "title": "El espectáculo",
@@ -106,16 +102,15 @@
         "text": "Un espectáculo que forma parte de la Navidad de Santillana del Mar, con la confianza del ayuntamiento año tras año."
       },
       "cta": "¿Quieres crear un espectáculo para tu ciudad o tu evento? Contacta con Sonido León.",
+      "slug": "videomapping-navidad-santillana-del-mar",
       "seoTitle": "Videomapping en Navidad en Santillana del Mar | Sonido León",
       "metaDescription": "Videomapping navideño en Santillana del Mar desde 2022: «Santillana, origen y destino», «Luz y Magia», «El origen de la Magia» y espectáculos con actores. Producción de Sonido León."
     },
     {
       "published": true,
       "h1": "10 km de Laredo",
-      "slug": "sonido-10k-laredo",
       "category": "Eventos deportivos",
       "image": "/images/proyectos/laredo-10k.jpg",
-      "gallery": [],
       "description": [
         "Sonorización completa de los 10 km de Laredo 2026, una carrera internacional del más alto nivel.",
         "Nos encargamos de la rueda de prensa, de la megafonía y de que la escucha fuera nítida y clara en la zona de salida y meta, tanto para la narración de la carrera como para los avisos necesarios para el desarrollo correcto de la prueba."
@@ -141,16 +136,15 @@
         "text": "Una prueba de nivel internacional en la que cada aviso y cada momento de la narración llegó con claridad a corredores y público."
       },
       "cta": "¿Organizas una prueba deportiva o un evento al aire libre? Te ayudamos a que se oiga bien en todo el recorrido.",
+      "slug": "sonido-10k-laredo",
       "seoTitle": "10 km de Laredo: sonido y megafonía | Sonido León",
       "metaDescription": "Sonorización de los 10 km de Laredo 2026, carrera internacional: rueda de prensa, megafonía y escucha nítida en salida y meta. Sonido León."
     },
     {
       "published": true,
       "h1": "Jueves de Boleros",
-      "slug": "jueves-de-boleros",
       "category": "Conciertos y giras",
       "image": "/images/proyectos/jueves-de-boleros.jpg",
-      "gallery": [],
       "description": [
         "Sonido León acompaña a Jueves de Boleros en directo. En octubre de 2025 estuvimos, un año más, en su XIV Festival en el Palacio de Festivales de Cantabria.",
         "En 2026 la colaboración sigue en su gira, con conciertos como los de Comillas y Cabezón de la Sal."
@@ -174,6 +168,7 @@
         "text": "Una colaboración que se repite año tras año."
       },
       "cta": "¿Eres artista o agencia y buscas un equipo técnico de confianza para tu gira? Hablemos.",
+      "slug": "jueves-de-boleros",
       "seoTitle": "Jueves de Boleros en directo | Sonido León",
       "metaDescription": "Sonido León acompaña a Jueves de Boleros en directo: XIV Festival en el Palacio de Festivales de Cantabria y gira 2026."
     }
