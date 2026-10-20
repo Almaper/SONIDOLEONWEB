@@ -1,0 +1,32 @@
+{
+  "title": "En Instagram",
+  "subtitle": "El día a día de nuestros trabajos.",
+  "profile": "https://www.instagram.com/sonido_leon/",
+  "handle": "@sonido_leon",
+  "posts": [
+    {
+      "url": "https://www.instagram.com/sonido_leon/reel/DeuonFtx5ej/",
+      "image": "/images/instagram/reel-presentacion.jpg",
+      "title": "Sonido, luz e imagen",
+      "reel": true
+    },
+    {
+      "url": "https://www.instagram.com/sonido_leon/reel/DS4vKH7kQtF/",
+      "image": "/images/instagram/comillas.jpg",
+      "title": "Videomapping navideño en Comillas",
+      "reel": true
+    },
+    {
+      "url": "https://www.instagram.com/sonido_leon/reel/DSw8shIkZ3_/",
+      "image": "/images/instagram/santillana-2025.jpg",
+      "title": "Navidad en Santillana del Mar",
+      "reel": true
+    },
+    {
+      "url": "https://www.instagram.com/sonido_leon/p/DPYer-JiJQV/",
+      "image": "/images/instagram/jueves-de-boleros.jpg",
+      "title": "XIV Festival Jueves de Boleros",
+      "reel": false
+    }
+  ]
+}

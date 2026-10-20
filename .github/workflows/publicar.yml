@@ -1,0 +1,78 @@
+# Publica la web: compila el código de esta rama y sube el resultado a la rama main,
+# que es la que sirve GitHub Pages en sonidoleon.com.
+name: Publicar web
+
+on:
+  push:
+    branches: [codigo]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Compilar
+        run: pnpm exec next build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Reducir fotos grandes
+        run: |
+          pip install --quiet pillow
+          python3 - <<'PY'
+          import pathlib
+          from PIL import Image, ImageOps
+          for f in pathlib.Path("out/images").rglob("*"):
+              if f.suffix.lower() not in (".jpg", ".jpeg", ".png", ".webp"):
+                  continue
+              im = Image.open(f)
+              if max(im.size) <= 1920 and f.stat().st_size <= 600_000:
+                  continue
+              im = ImageOps.exif_transpose(im)
+              im.thumbnail((1920, 1920))
+              if f.suffix.lower() in (".jpg", ".jpeg"):
+                  im.convert("RGB").save(f, quality=82, optimize=True, progressive=True)
+              else:
+                  im.save(f, optimize=True)
+              print("reducida:", f)
+          PY
+
+      - name: Subir a la rama main (web publicada)
+        env:
+          MENSAJE: ${{ github.event.head_commit.message }}
+        run: |
+          git fetch origin main --depth=1
+          git worktree add publicada origin/main
+          cd publicada
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name README.md -exec rm -rf {} +
+          cp -a ../out/. .
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Sin cambios en la web."
+            exit 0
+          fi
+          git -c user.name="Publicación automática" -c user.email="actions@users.noreply.github.com" \
+            commit -m "Publica: $(printf '%s' "${MENSAJE:-publicación manual}" | head -n 1)"
+          git push origin HEAD:main

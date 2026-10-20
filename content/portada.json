@@ -1,0 +1,85 @@
+{
+  "maintenanceMode": false,
+  "hero": {
+    "title": "Sonido",
+    "highlight": "León",
+    "subtitle": "Sonorización · Iluminación · Videomapping",
+    "image": "/images/hero-bg.jpg",
+    "badge": "Desde 2004 · +22 años de experiencia",
+    "stats": [
+      {
+        "value": "+4.000",
+        "label": "Trabajos"
+      },
+      {
+        "value": "+22",
+        "label": "Años"
+      },
+      {
+        "value": "+500",
+        "label": "Clientes"
+      }
+    ]
+  },
+  "about": {
+    "title": "Quiénes somos",
+    "paragraphs": [
+      "Desde 2004, en Sonido León combinamos más de dos décadas de experiencia con la pasión por el espectáculo. Nuestro equipo de profesionales domina las últimas tecnologías audiovisuales para transformar cada evento en una experiencia sensorial única.",
+      "Contamos con equipamiento de última generación y un compromiso inquebrantable con la calidad. Desde pequeños actos hasta grandes festivales, adaptamos nuestras soluciones a cada necesidad, garantizando un resultado impecable."
+    ],
+    "stats": [
+      {
+        "value": "+4.000",
+        "label": "Trabajos realizados"
+      },
+      {
+        "value": "+22",
+        "label": "Años de experiencia"
+      },
+      {
+        "value": "+500",
+        "label": "Clientes satisfechos"
+      },
+      {
+        "value": "100%",
+        "label": "Solución integral"
+      }
+    ]
+  },
+  "services": {
+    "title": "Servicios",
+    "subtitle": "Soluciones audiovisuales integrales para hacer de tu evento una experiencia inolvidable.",
+    "items": [
+      {
+        "id": "s1",
+        "icon": "volume",
+        "title": "Sonorización de conciertos",
+        "description": "Sistemas de audio de alta potencia y fidelidad. Diseñamos e instalamos soluciones sonoras a medida para conciertos, festivales y eventos en directo."
+      },
+      {
+        "id": "s2",
+        "icon": "lightbulb",
+        "title": "Iluminación de eventos",
+        "description": "Creamos ambientes únicos con diseños de iluminación profesional. Desde focos móviles hasta sistemas LED inteligentes para cualquier tipo de evento."
+      },
+      {
+        "id": "s3",
+        "icon": "monitor",
+        "title": "Videomapping",
+        "description": "Transformamos superficies en lienzos digitales. Proyecciones inmersivas y videomapping arquitectónico que fusionan arte y tecnología."
+      },
+      {
+        "id": "s4",
+        "icon": "party",
+        "title": "Bodas y eventos privados",
+        "description": "Sonido, iluminación y ambiente para bodas, cumpleaños, fiestas y celebraciones. Desde la ceremonia hasta el baile, con técnico durante todo el evento."
+      },
+      {
+        "id": "s5",
+        "icon": "speaker",
+        "title": "Instalaciones de audio",
+        "description": "Diseño e instalación de sistemas de sonido fijos para salas, bares, restaurantes, hoteles y espacios municipales. Te asesoramos sin compromiso."
+      }
+    ]
+  }
+}

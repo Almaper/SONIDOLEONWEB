@@ -1,0 +1,312 @@
+# Panel de administración de sonidoleon.com (Pages CMS · https://app.pagescms.org)
+# Cada vez que se guarda algo, GitHub vuelve a publicar la web sola en 2-3 minutos.
+
+media:
+  input: public/images
+  output: /images
+
+content:
+  # ───────────────────────── PROYECTOS ─────────────────────────
+  - name: proyectos
+    label: Proyectos
+    type: file
+    path: content/proyectos.json
+    fields:
+      - name: title
+        label: Título de la sección
+        type: string
+      - name: subtitle
+        label: Subtítulo de la sección
+        type: string
+      - name: items
+        label: Proyectos
+        description: Arrastra para cambiar el orden en que salen en la web. Para quitar uno sin borrarlo, desmarca «Publicado».
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{h1}"
+        fields:
+          - name: published
+            label: Publicado
+            type: boolean
+          - name: h1
+            label: Título del proyecto
+            type: string
+            required: true
+          - name: category
+            label: Categoría
+            description: "Ej.: Videomapping, Conciertos y giras, Eventos deportivos, Eventos corporativos, Instalaciones…"
+            type: string
+          - name: image
+            label: Foto principal
+            description: Se usa en la tarjeta de la portada y arriba en la página del proyecto. Mejor en horizontal.
+            type: image
+            options:
+              path: public/images/proyectos
+              extensions: [jpg, jpeg, png, webp]
+          - name: gallery
+            label: Más fotos (opcional)
+            type: image
+            options:
+              path: public/images/proyectos
+              extensions: [jpg, jpeg, png, webp]
+              multiple:
+                max: 12
+          - name: description
+            label: Texto (un párrafo por casilla)
+            type: text
+            list: true
+          - name: characteristics
+            label: Bloque 1 (opcional)
+            type: object
+            fields:
+              - name: title
+                label: Título del bloque
+                description: "Ej.: El espectáculo, El evento"
+                type: string
+              - name: items
+                label: Puntos
+                type: string
+                list: true
+          - name: workDone
+            label: Bloque 2 · Qué hicimos (opcional)
+            type: object
+            fields:
+              - name: title
+                label: Título del bloque
+                description: "Ej.: Trabajo de Sonido León"
+                type: string
+              - name: items
+                label: Puntos
+                type: string
+                list: true
+          - name: impact
+            label: Bloque 3 · Resultado (opcional)
+            type: object
+            fields:
+              - name: title
+                label: Título del bloque
+                type: string
+              - name: text
+                label: Texto
+                type: text
+          - name: cta
+            label: Frase final antes del botón «Contactar»
+            type: text
+          - name: slug
+            label: Dirección de la página (opcional)
+            description: "Lo que va detrás de sonidoleon.com/proyectos/. Si lo dejas vacío se crea solo a partir del título. No lo cambies en proyectos ya publicados."
+            type: string
+            pattern:
+              regex: "^[a-z0-9-]*$"
+              message: Solo minúsculas, números y guiones, sin tildes ni espacios.
+          - name: seoTitle
+            label: Título para Google (opcional)
+            type: string
+          - name: metaDescription
+            label: Descripción para Google (opcional)
+            description: Si lo dejas vacío se usa el principio del texto.
+            type: text
+
+  # ───────────────────────── PORTADA ─────────────────────────
+  - name: portada
+    label: Portada, quiénes somos y servicios
+    type: file
+    path: content/portada.json
+    fields:
+      - name: maintenanceMode
+        label: Web en mantenimiento
+        description: "¡Ojo! Si lo marcas, la portada muestra solo un aviso de «Sitio en mantenimiento»."
+        type: boolean
+      - name: hero
+        label: Cabecera (lo primero que se ve)
+        type: object
+        fields:
+          - name: subtitle
+            label: Frase bajo el logo
+            type: string
+          - name: badge
+            label: Etiqueta de experiencia
+            type: string
+          - name: stats
+            label: Cifras
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{value} {label}"
+            fields:
+              - name: value
+                label: Cifra
+                type: string
+              - name: label
+                label: Texto
+                type: string
+          - name: image
+            label: Foto de fondo
+            type: image
+            options:
+              path: public/images
+          - name: title
+            type: string
+            hidden: true
+          - name: highlight
+            type: string
+            hidden: true
+      - name: about
+        label: Quiénes somos
+        type: object
+        fields:
+          - name: title
+            label: Título
+            type: string
+          - name: paragraphs
+            label: Párrafos
+            type: text
+            list: true
+          - name: stats
+            label: Cifras
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{value} {label}"
+            fields:
+              - name: value
+                label: Cifra
+                type: string
+              - name: label
+                label: Texto
+                type: string
+      - name: services
+        label: Servicios
+        type: object
+        fields:
+          - name: title
+            label: Título
+            type: string
+          - name: subtitle
+            label: Subtítulo
+            type: text
+          - name: items
+            label: Servicios
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{title}"
+            fields:
+              - name: title
+                label: Nombre
+                type: string
+              - name: description
+                label: Descripción
+                type: text
+              - name: icon
+                label: Icono
+                type: select
+                options:
+                  values:
+                    - name: volume
+                      label: Sonido
+                    - name: lightbulb
+                      label: Iluminación
+                    - name: monitor
+                      label: Pantalla / videomapping
+                    - name: party
+                      label: Fiesta / eventos
+                    - name: speaker
+                      label: Altavoz / instalación
+              - name: id
+                type: string
+                hidden: true
+
+  # ───────────────────────── INSTAGRAM ─────────────────────────
+  - name: instagram
+    label: Sección «En Instagram»
+    type: file
+    path: content/instagram.json
+    fields:
+      - name: title
+        label: Título
+        type: string
+      - name: subtitle
+        label: Subtítulo
+        type: string
+      - name: posts
+        label: Publicaciones (se ven 4; pon la nueva arriba)
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{title}"
+        fields:
+          - name: title
+            label: Título corto
+            type: string
+          - name: url
+            label: Enlace de la publicación
+            description: "Desde Instagram: ··· › Copiar enlace"
+            type: string
+          - name: image
+            label: Imagen (cuadrada)
+            type: image
+            options:
+              path: public/images/instagram
+          - name: reel
+            label: Es un reel
+            type: boolean
+      - name: profile
+        type: string
+        hidden: true
+      - name: handle
+        type: string
+        hidden: true
+
+  # ───────────────────────── CONTACTO ─────────────────────────
+  - name: contacto
+    label: Contacto y redes
+    type: file
+    path: content/contacto.json
+    fields:
+      - name: title
+        label: Título
+        type: string
+      - name: subtitle
+        label: Subtítulo
+        type: text
+      - name: info
+        label: Datos de contacto
+        type: object
+        fields:
+          - name: phone
+            label: Teléfono
+            type: string
+          - name: email
+            label: Email
+            type: string
+          - name: address
+            label: Dirección
+            type: string
+      - name: social
+        label: Redes sociales
+        description: Deja «#» en las que no uséis y no saldrán.
+        type: object
+        fields:
+          - name: instagram
+            label: Instagram
+            type: string
+          - name: youtube
+            label: YouTube
+            type: string
+          - name: facebook
+            label: Facebook
+            type: string
+      - name: footer
+        label: Pie de página
+        type: object
+        fields:
+          - name: copyright
+            label: Texto de copyright
+            type: string
