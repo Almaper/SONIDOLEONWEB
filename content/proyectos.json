@@ -4,6 +4,41 @@
   "items": [
     {
       "published": true,
+      "h1": "La Sonrisa de Julia en la Semana Grande de Santander",
+      "slug": "la-sonrisa-de-julia-semana-grande-santander",
+      "category": "Conciertos y giras",
+      "image": "/images/proyectos/la-sonrisa-de-julia-semana-grande.jpg",
+      "gallery": [],
+      "description": [
+        "El 20 de julio de 2026, La Sonrisa de Julia actuó en el Escenario Porticada, en la Plaza Porticada de Santander, dentro de la programación de la Semana Grande.",
+        "Sonido León se encargó del sonido y de la iluminación del concierto. Para el grupo diseñamos una puesta en escena de aire retro, con focos vintage sobre el escenario, y llevamos la mesa de luces en directo durante toda la actuación."
+      ],
+      "characteristics": {
+        "title": "El concierto",
+        "items": [
+          "Escenario Porticada, Semana Grande de Santander 2026",
+          "Concierto en directo de La Sonrisa de Julia",
+          "Puesta en escena de aire retro con focos vintage"
+        ]
+      },
+      "workDone": {
+        "title": "Trabajo de Sonido León",
+        "items": [
+          "Sonido del concierto",
+          "Diseño de iluminación y puesta en escena",
+          "Control de la mesa de luces en directo"
+        ]
+      },
+      "impact": {
+        "title": "",
+        "text": ""
+      },
+      "cta": "¿Tienes un concierto o un festival y buscas sonido e iluminación con criterio? Hablemos.",
+      "seoTitle": "La Sonrisa de Julia en la Semana Grande de Santander | Sonido León",
+      "metaDescription": "Sonido, iluminación y puesta en escena retro con focos vintage para el concierto de La Sonrisa de Julia en la Plaza Porticada, Semana Grande de Santander 2026."
+    },
+    {
+      "published": true,
       "h1": "Videomapping navideño en Comillas",
       "category": "Videomapping",
       "image": "/images/proyectos/comillas.jpg",
@@ -77,7 +112,7 @@
       "image": "/images/proyectos/santillana-2025.jpg",
       "description": [
         "Desde la Navidad de 2022, Sonido León produce el videomapping navideño de Santillana del Mar junto a su ayuntamiento. Cada año, una historia nueva sobre las fachadas del casco histórico.",
-        "La edición de 2022, «Santillana, origen y destino», llegó a presentarse en FITUR. Le siguieron «Santillana del Mar, Luz y Magia» en 2023, «El origen de la Magia» en 2024 y, en 2025, se realizo la impresionante «In Nomine Lux»"
+        "La edición de 2022, «Santillana, origen y destino», llegó a presentarse en FITUR. Le siguieron «Santillana del Mar, Luz y Magia» en 2023, «El origen de la Magia» en 2024 y, en 2025, se realizó la impresionante «In Nomine Lux»."
       ],
       "characteristics": {
         "title": "El espectáculo",
