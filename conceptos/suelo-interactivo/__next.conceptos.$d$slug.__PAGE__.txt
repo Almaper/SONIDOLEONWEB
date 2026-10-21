@@ -1,0 +1,6 @@
+1:"$Sreact.fragment"
+2:I[7120,["/_next/static/chunks/823adbeafa1963c4.js","/_next/static/chunks/746eac9ac48e945a.js"],"ProjectView"]
+3:I[59374,["/_next/static/chunks/c835ef42487ce2c8.js","/_next/static/chunks/f19e4129d752cb5c.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+0:{"buildId":"rJmQUSvFW0oxLKV84m163","rsc":["$","$1","c",{"children":[["$","$L2",null,{"project":{"id":"pp3","slug":"suelo-interactivo","seoTitle":"Suelo interactivo · Concepto | Sonido León","metaDescription":"Luz e imagen que responden a la presencia y al movimiento del público.","h1":"Suelo interactivo","heroImage":"/images/conceptos/suelo-interactivo.jpg","cardImage":"/images/conceptos/suelo-interactivo.jpg","imageNote":"Imagen 3D provisional","category":"Concepto","gallery":[],"description":["Luz e imagen que responden a la presencia y al movimiento del público."],"characteristics":{"title":"Elementos","items":["Detección de presencia","Proyección cenital","Respuesta en tiempo real"]},"workDone":{"title":"","items":[]},"impact":{"title":"","text":""},"cta":"","published":true}}],[["$","script","script-0",{"src":"/_next/static/chunks/746eac9ac48e945a.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"loading":null,"isPartial":false}
+5:null
