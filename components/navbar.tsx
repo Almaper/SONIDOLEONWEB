@@ -1,15 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Menu, X, Instagram } from "lucide-react";
 
 const INSTAGRAM_URL = "https://www.instagram.com/sonido_leon/";
-import Image from "next/image";
 
 const navLinks = [
-  { label: "Inicio", href: "/#inicio" },
-  { label: "Servicios", href: "/#servicios" },
-  { label: "Proyectos", href: "/#proyectos" },
+  { label: "Qué hacemos", href: "/#que-hacemos" },
+  { label: "Conceptos", href: "/#conceptos" },
   { label: "Contacto", href: "/#contacto" },
 ];
 
@@ -18,96 +17,58 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-background/95 backdrop-blur-md border-b border-border"
-          : "bg-transparent"
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+        scrolled || isOpen ? "border-b border-border bg-background/90 backdrop-blur-md" : "bg-transparent"
       }`}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-        <a href="/#inicio" className="flex items-center">
-          <Image
-            src="/images/logo.png"
-            alt="Sonido León"
-            width={160}
-            height={48}
-            className="h-10 w-auto md:h-12"
-            priority
-          />
+        <a href="/#inicio" className="flex items-center" aria-label="Sonido León, inicio">
+          <Image src="/images/logo.png" alt="Sonido León" width={160} height={48} className="h-9 w-auto md:h-10" priority />
         </a>
 
-        {/* Desktop menu */}
-        <ul className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-10 md:flex">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <a
-                href={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-              >
+              <a href={link.href} className="etiqueta text-muted-foreground transition-colors hover:text-primary">
                 {link.label}
               </a>
             </li>
           ))}
           <li>
-            <a
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram de Sonido León"
-              className="text-muted-foreground transition-colors hover:text-primary"
-            >
-              <Instagram className="h-5 w-5" />
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label="Instagram de Sonido León" className="text-muted-foreground transition-colors hover:text-primary">
+              <Instagram className="h-4 w-4" />
             </a>
           </li>
         </ul>
 
-        {/* Mobile hamburger */}
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-foreground md:hidden"
-          aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
-        >
+        <button type="button" onClick={() => setIsOpen(!isOpen)} className="text-foreground md:hidden" aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}>
           {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </nav>
 
-      {/* Mobile menu */}
       {isOpen && (
-        <div className="border-b border-border bg-background/95 backdrop-blur-md md:hidden">
-          <ul className="flex flex-col gap-1 px-6 pb-6">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="block rounded-md px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-            <li>
+        <ul className="flex flex-col gap-1 px-6 pb-6 md:hidden">
+          {[...navLinks, { label: "Instagram", href: INSTAGRAM_URL }].map((link) => (
+            <li key={link.href}>
               <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={link.href}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
+                {...(link.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="etiqueta block border-b border-border py-4 text-muted-foreground transition-colors hover:text-primary"
               >
-                <Instagram className="h-5 w-5" />
-                Instagram
+                {link.label}
               </a>
             </li>
-          </ul>
-        </div>
+          ))}
+        </ul>
       )}
     </header>
   );

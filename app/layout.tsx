@@ -16,26 +16,34 @@ const _inter = localFont({
   display: "swap",
 });
 
-const _poppins = localFont({
+const _display = localFont({
   src: [
-    { path: "./fonts/poppins-latin-400-normal.woff2", weight: "400" },
-    { path: "./fonts/poppins-latin-500-normal.woff2", weight: "500" },
-    { path: "./fonts/poppins-latin-600-normal.woff2", weight: "600" },
-    { path: "./fonts/poppins-latin-700-normal.woff2", weight: "700" },
-    { path: "./fonts/poppins-latin-800-normal.woff2", weight: "800" },
+    { path: "./fonts/space-grotesk-latin-400-normal.woff2", weight: "400" },
+    { path: "./fonts/space-grotesk-latin-500-normal.woff2", weight: "500" },
+    { path: "./fonts/space-grotesk-latin-700-normal.woff2", weight: "700" },
   ],
-  variable: "--font-poppins",
+  variable: "--font-display",
+  display: "swap",
+});
+
+const _mono = localFont({
+  src: [
+    { path: "./fonts/jetbrains-mono-latin-400-normal.woff2", weight: "400" },
+    { path: "./fonts/jetbrains-mono-latin-500-normal.woff2", weight: "500" },
+  ],
+  variable: "--font-mono",
   display: "swap",
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://sonidoleon.com";
+const SITE_TITLE = "Sonido León — Instalaciones inmersivas, videomapping y escenografía";
 const SITE_DESCRIPTION =
-  "Sonido León: sonorización, iluminación y videomapping para conciertos, bodas, eventos privados, ayuntamientos e instalaciones de audio. Pide presupuesto sin compromiso.";
+  "Sonido León desarrolla instalaciones inmersivas, videomapping y elementos escenográficos de luz, imagen y sonido, adaptados a cada espacio.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Sonido León — Sonorización · Iluminación · Videomapping",
+    default: SITE_TITLE,
     template: "%s | Sonido León",
   },
   description: SITE_DESCRIPTION,
@@ -45,20 +53,20 @@ export const metadata: Metadata = {
     locale: "es_ES",
     url: "/",
     siteName: "Sonido León",
-    title: "Sonido León — Sonorización · Iluminación · Videomapping",
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     images: [{ url: "/images/og-sonido-leon.jpg", width: 1200, height: 630, alt: "Sonido León" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sonido León — Sonorización · Iluminación · Videomapping",
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     images: ["/images/og-sonido-leon.jpg"],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: "#08080a",
 };
 
 export default function RootLayout({
@@ -67,7 +75,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${_inter.variable} ${_poppins.variable}`}>
+    <html lang="es" className={`${_inter.variable} ${_display.variable} ${_mono.variable}`}>
       <body className="font-sans antialiased">
         {children}
         <CookieBanner />

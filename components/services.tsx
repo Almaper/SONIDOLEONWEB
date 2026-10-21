@@ -1,16 +1,16 @@
 "use client";
 
-import React from "react"
-
-import { useEffect, useRef, useState } from "react";
-import { Volume2, Lightbulb, Monitor, PartyPopper, Speaker } from "lucide-react";
+import React from "react";
+import { Lightbulb, Monitor, Box, Hand, Volume2, PartyPopper, Speaker } from "lucide-react";
 import { useCMS } from "@/lib/cms-data";
 import type { ServiceItem } from "@/lib/cms-data";
 
 const iconMap: Record<ServiceItem["icon"], React.ElementType> = {
-  volume: Volume2,
-  lightbulb: Lightbulb,
   monitor: Monitor,
+  box: Box,
+  hand: Hand,
+  lightbulb: Lightbulb,
+  volume: Volume2,
   party: PartyPopper,
   speaker: Speaker,
 };
@@ -18,52 +18,27 @@ const iconMap: Record<ServiceItem["icon"], React.ElementType> = {
 export function Services() {
   const { data } = useCMS();
   const { services } = data;
-  const [visible, setVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setVisible(true);
-      },
-      { threshold: 0.15 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
 
   return (
-    <section id="servicios" className="relative py-24 lg:py-32 bg-background/85 backdrop-blur-sm" ref={ref}>
+    <section id="que-hacemos" className="border-t border-border bg-background py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-bold text-primary sm:text-4xl text-balance">
-            {services.title}
-          </h2>
-          <p className="mt-4 text-muted-foreground leading-relaxed">
-            {services.subtitle}
-          </p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <h2 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">{services.title}</h2>
+          {services.subtitle && <p className="max-w-md text-muted-foreground">{services.subtitle}</p>}
         </div>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-14 grid border-l border-t border-border sm:grid-cols-2 lg:grid-cols-4">
           {services.items.map((service, i) => {
-            const Icon = iconMap[service.icon] || Volume2;
+            const Icon = iconMap[service.icon] || Monitor;
             return (
-              <div
-                key={service.id}
-                className={`group rounded-lg border-b-2 border-primary/30 bg-card p-8 transition-all duration-500 hover:border-primary hover:bg-secondary ${
-                  visible ? "animate-fade-in-up" : "opacity-0"
-                }`}
-                style={{ animationDelay: `${i * 150}ms` }}
-              >
-                <div className="mb-5 inline-flex rounded-md bg-primary/10 p-3">
-                  <Icon className="h-7 w-7 text-primary" />
+              <div key={service.id} className="group relative border-b border-r border-border p-8 transition-colors hover:bg-card">
+                <span className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-500 group-hover:scale-x-100" />
+                <div className="flex items-center justify-between">
+                  <span className="etiqueta text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+                  <Icon className="h-5 w-5 text-primary" strokeWidth={1.5} />
                 </div>
-                <h3 className="font-display text-xl font-semibold text-foreground">
-                  {service.title}
-                </h3>
-                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                  {service.description}
-                </p>
+                <h3 className="mt-12 font-display text-xl font-medium">{service.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{service.description}</p>
               </div>
             );
           })}

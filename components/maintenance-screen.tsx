@@ -1,14 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { Phone, Mail, Instagram, MessageCircle } from "lucide-react";
+import { Phone, Mail, Instagram } from "lucide-react";
 import type { CMSData } from "@/lib/site-content";
 
 export function MaintenanceScreen({ data }: { data: CMSData }) {
   const { phone, email, address } = data.contact.info;
   const tel = phone.replace(/[^\d+]/g, "");
-  const wa = tel.replace(/^\+/, "");
-  const waText = encodeURIComponent("[Web sonidoleon.com] Hola, os escribo desde vuestra web.");
   const instagram = data.contact.social.instagram;
   const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(data.maintenance.since);
@@ -48,15 +46,6 @@ export function MaintenanceScreen({ data }: { data: CMSData }) {
           >
             <Phone className="h-5 w-5" />
             {phone}
-          </a>
-          <a
-            href={`https://wa.me/${wa}?text=${waText}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-7 py-4 font-semibold transition-colors hover:border-primary hover:text-primary"
-          >
-            <MessageCircle className="h-5 w-5" />
-            WhatsApp
           </a>
         </div>
 

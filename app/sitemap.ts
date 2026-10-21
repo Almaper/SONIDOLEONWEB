@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export const dynamic = "force-static";
 import { defaultData } from "@/lib/site-content";
 
-// Todas las fichas de proyecto publicadas entran solas en el sitemap.
+// Todas las fichas de concepto publicadas entran solas en el sitemap.
 const projectSlugs = defaultData.projectPages
   .filter((p) => p.published)
   .map((p) => p.slug);
@@ -27,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const projectPages: MetadataRoute.Sitemap = projectSlugs.map((slug) => ({
-    url: `${baseUrl}/proyectos/${slug}`,
+    url: `${baseUrl}/conceptos/${slug}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.8,

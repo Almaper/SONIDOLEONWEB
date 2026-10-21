@@ -19,6 +19,7 @@ export interface ProjectPageItem {
   h1: string;
   heroImage: string;
   cardImage: string;
+  imageNote: string;
   category: string;
   gallery: string[];
   description: string[];
@@ -54,7 +55,7 @@ export interface NewsItem {
 
 export interface ServiceItem {
   id: string;
-  icon: "volume" | "lightbulb" | "monitor" | "party" | "speaker";
+  icon: "volume" | "lightbulb" | "monitor" | "party" | "speaker" | "box" | "hand";
   title: string;
   description: string;
 }
@@ -132,6 +133,7 @@ type ProyectoJSON = {
   slug?: string;
   category?: string;
   image?: string;
+  imageNote?: string;
   gallery?: string[];
   description?: string[];
   characteristics?: { title?: string; items?: string[] };
@@ -157,11 +159,12 @@ const projectPages: ProjectPageItem[] = (proyectos.items as ProyectoJSON[]).map(
   return {
     id: `pp${i + 1}`,
     slug: p.slug?.trim() || slugify(p.h1),
-    seoTitle: p.seoTitle?.trim() || `${p.h1} | Sonido León`,
+    seoTitle: p.seoTitle?.trim() || `${p.h1} · Concepto | Sonido León`,
     metaDescription: p.metaDescription?.trim() || (description[0] ?? p.h1).slice(0, 160),
     h1: p.h1,
     heroImage: image,
     cardImage: image,
+    imageNote: p.imageNote ?? "",
     category: p.category ?? "",
     gallery: (p.gallery ?? []).filter(Boolean),
     description,

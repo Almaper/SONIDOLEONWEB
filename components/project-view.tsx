@@ -2,150 +2,78 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Phone, Instagram } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { ProjectPageItem } from "@/lib/site-content";
 import { CMSProvider } from "@/lib/cms-data";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 
-function ProjectContent({ project }: { project: ProjectPageItem }) {
+function ConceptContent({ project }: { project: ProjectPageItem }) {
+  const bloques = [project.characteristics, project.workDone].filter((b) => b.items.length > 0);
+
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Fixed background */}
-      <div className="fixed inset-0 -z-10">
-        <Image
-          src={project.heroImage}
-          alt=""
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-background/80" />
-      </div>
-
+    <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-28">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-            <Link
-              href="/#proyectos"
-              className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors mb-8"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Volver a proyectos
-            </Link>
+        <section className="mx-auto max-w-7xl px-6 pb-10 pt-32 lg:px-8 lg:pt-40">
+          <Link href="/#conceptos" className="etiqueta inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary">
+            <ArrowLeft className="h-4 w-4" />
+            Conceptos
+          </Link>
+          <p className="etiqueta mt-10 flex items-center gap-3 text-primary">
+            <span className="h-px w-10 bg-primary" />
+            {project.category || "Concepto"}
+          </p>
+          <h1 className="mt-5 max-w-4xl font-display text-4xl font-medium leading-[1.05] tracking-tight text-balance sm:text-6xl">
+            {project.h1}
+          </h1>
+        </section>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 text-balance">
-              {project.h1}
-            </h1>
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="relative aspect-[16/9] overflow-hidden border border-border bg-card">
+            <Image src={project.heroImage} alt={project.h1} fill priority sizes="100vw" className="object-cover" />
+          </div>
+          {project.imageNote && <p className="etiqueta mt-3 text-[0.65rem] text-muted-foreground/60">{project.imageNote}</p>}
+        </div>
 
-            {/* Hero Image */}
-            <div className="relative aspect-video rounded-lg overflow-hidden mb-12">
-              <Image
-                src={project.heroImage}
-                alt={project.h1}
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-
-            {/* Description */}
-            <div className="prose prose-lg prose-invert max-w-none mb-16">
-              {project.description.map((paragraph, idx) => (
-                <p key={idx} className="text-lg text-muted-foreground leading-relaxed mb-4">
-                  {paragraph}
-                </p>
+        <section className="mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-12 lg:px-8 lg:py-24">
+          <div className="space-y-5 lg:col-span-7">
+            {project.description.map((p, i) => (
+              <p key={i} className={i === 0 ? "font-display text-2xl leading-snug text-foreground sm:text-3xl" : "text-lg leading-relaxed text-muted-foreground"}>
+                {p}
+              </p>
+            ))}
+            {project.impact.text && <p className="text-lg leading-relaxed text-muted-foreground">{project.impact.text}</p>}
+          </div>
+          {bloques.length > 0 && (
+            <div className="space-y-10 lg:col-span-4 lg:col-start-9">
+              {bloques.map((b, k) => (
+                <div key={k}>
+                  {b.title && <p className="etiqueta text-muted-foreground">{b.title}</p>}
+                  <ul className="mt-4 border-t border-border">
+                    {b.items.map((item, i) => (
+                      <li key={i} className="flex gap-4 border-b border-border py-3 text-sm">
+                        <span className="font-mono text-xs text-primary">{String(i + 1).padStart(2, "0")}</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
             </div>
-
-            {/* Galería */}
-            {project.gallery.length > 0 && (
-              <div className="mb-16 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {project.gallery.map((src, idx) => (
-                  <div key={src + idx} className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                    <Image src={src} alt={`${project.h1}, foto ${idx + 1}`} fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Characteristics */}
-            {project.characteristics.items.length > 0 && (
-<section className="mb-16">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
-                {project.characteristics.title}
-              </h2>
-              <ul className="space-y-3">
-                {project.characteristics.items.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-            )}
-
-            {/* Work Done */}
-            {project.workDone.items.length > 0 && (
-<section className="mb-16">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
-                {project.workDone.title}
-              </h2>
-              <ul className="space-y-3">
-                {project.workDone.items.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-            )}
-
-            {/* Impact */}
-            {project.impact.text && (
-<section className="mb-16">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
-                {project.impact.title}
-              </h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                {project.impact.text}
-              </p>
-            </section>
-            )}
-
-            {/* CTA */}
-            <section className="bg-primary/10 border border-primary/30 rounded-lg p-8 text-center">
-              <p className="text-xl text-foreground mb-6">
-                {project.cta || "¿Tienes un proyecto en mente? Hablemos."}
-              </p>
-              <Link
-                href="/#contacto"
-                className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-md font-semibold hover:bg-primary/90 transition-colors"
-              >
-                <Phone className="h-5 w-5" />
-                Contactar
-              </Link>
-            </section>
-
-            <p className="pt-4 text-center">
-              <a
-                href="https://www.instagram.com/sonido_leon/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-primary transition-colors hover:text-primary/80"
-              >
-                <Instagram className="h-5 w-5" />
-                Más trabajos en Instagram
-              </a>
-            </p>
-          </div>
+          )}
         </section>
+
+        {project.gallery.length > 0 && (
+          <section className="mx-auto grid max-w-7xl gap-6 px-6 pb-24 sm:grid-cols-2 lg:px-8">
+            {project.gallery.map((src, idx) => (
+              <div key={src + idx} className="relative aspect-[4/3] overflow-hidden border border-border">
+                <Image src={src} alt={`${project.h1}, imagen ${idx + 1}`} fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
+              </div>
+            ))}
+          </section>
+        )}
       </main>
 
       <Footer />
@@ -156,8 +84,7 @@ function ProjectContent({ project }: { project: ProjectPageItem }) {
 export function ProjectView({ project }: { project: ProjectPageItem }) {
   return (
     <CMSProvider>
-      <ProjectContent project={project} />
-      <WhatsAppButton project={project.h1} />
+      <ConceptContent project={project} />
     </CMSProvider>
   );
 }

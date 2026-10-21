@@ -29,11 +29,11 @@ export async function generateMetadata({
   return {
     title: { absolute: project.seoTitle },
     description: project.metaDescription,
-    alternates: { canonical: `/proyectos/${project.slug}` },
+    alternates: { canonical: `/conceptos/${project.slug}` },
     openGraph: {
       title: project.seoTitle,
       description: project.metaDescription,
-      url: `/proyectos/${project.slug}`,
+      url: `/conceptos/${project.slug}`,
       images: [{ url: project.heroImage }],
       type: "article",
     },
