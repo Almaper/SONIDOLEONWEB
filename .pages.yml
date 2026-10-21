@@ -129,6 +129,10 @@ content:
           - name: text
             label: Texto
             type: text
+          - name: since
+            label: En renovación desde
+            description: Fecha que se muestra en la pantalla. Cámbiala cuando vuelvas a activar el mantenimiento.
+            type: date
       - name: hero
         label: Cabecera (lo primero que se ve)
         type: object

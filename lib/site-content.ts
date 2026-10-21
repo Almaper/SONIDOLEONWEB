@@ -73,7 +73,7 @@ export interface ContactInfo {
 
 export interface CMSData {
   maintenanceMode: boolean;
-  maintenance: { title: string; text: string };
+  maintenance: { title: string; text: string; since: string };
   hero: {
     title: string;
     highlight: string;
@@ -178,6 +178,7 @@ export const defaultData: CMSData = {
   maintenance: {
     title: portada.maintenance?.title || "Estamos renovando nuestra web",
     text: portada.maintenance?.text || "Mientras tanto, seguimos trabajando como siempre. Llámanos o escríbenos y te atendemos.",
+    since: (portada.maintenance as { since?: string } | undefined)?.since || "",
   },
   hero: { ...portada.hero, image: portada.hero.image || "/images/hero-bg.jpg" },
   about: portada.about,

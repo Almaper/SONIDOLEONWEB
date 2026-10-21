@@ -2,7 +2,8 @@
   "maintenanceMode": true,
   "maintenance": {
     "title": "Estamos renovando nuestra web",
-    "text": "Mientras tanto, seguimos trabajando como siempre. Llámanos o escríbenos y te atendemos."
+    "text": "Mientras tanto, seguimos trabajando como siempre. Llámanos o escríbenos y te atendemos.",
+    "since": "2026-10-21"
   },
   "hero": {
     "title": "Sonido",

@@ -10,6 +10,9 @@ export function MaintenanceScreen({ data }: { data: CMSData }) {
   const wa = tel.replace(/^\+/, "");
   const waText = encodeURIComponent("[Web sonidoleon.com] Hola, os escribo desde vuestra web.");
   const instagram = data.contact.social.instagram;
+  const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(data.maintenance.since);
+  const desde = m ? `${Number(m[3])} de ${meses[Number(m[2]) - 1]} de ${m[1]}` : "";
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
@@ -21,8 +24,8 @@ export function MaintenanceScreen({ data }: { data: CMSData }) {
       <main className="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">
         <Image src="/images/logo.png" alt="Sonido León" width={360} height={110} priority className="h-auto w-56 sm:w-72" />
 
-        <p className="mt-14 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">
-          <span className="h-2 w-2 rounded-full bg-primary" />
+        <p className="mt-14 inline-flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:gap-3 sm:text-xs sm:tracking-[0.35em]">
+          <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />
           Web en renovación
         </p>
 
@@ -32,6 +35,11 @@ export function MaintenanceScreen({ data }: { data: CMSData }) {
         <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground text-pretty">
           {data.maintenance.text}
         </p>
+        {desde && (
+          <p className="mt-4 text-sm font-medium text-primary">
+            En renovación desde el {desde}
+          </p>
+        )}
 
         <div className="mt-10 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row">
           <a
