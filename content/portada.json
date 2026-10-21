@@ -1,5 +1,9 @@
 {
-  "maintenanceMode": false,
+  "maintenanceMode": true,
+  "maintenance": {
+    "title": "Estamos renovando nuestra web",
+    "text": "Mientras tanto, seguimos trabajando como siempre. Llámanos o escríbenos y te atendemos."
+  },
   "hero": {
     "title": "Sonido",
     "highlight": "León",

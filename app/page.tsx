@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Wrench } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MaintenanceScreen } from "@/components/maintenance-screen";
 import { CMSProvider, useCMS } from "@/lib/cms-data";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
@@ -14,36 +15,16 @@ import { InstagramFeed } from "@/components/instagram-feed";
 import { Footer } from "@/components/footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
-function MaintenanceScreen() {
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="text-center max-w-md">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
-          <Wrench className="h-10 w-10 text-primary" />
-        </div>
-        <h1 className="text-3xl font-bold text-foreground mb-4">
-          Sitio en mantenimiento
-        </h1>
-        <p className="text-muted-foreground mb-6">
-          Estamos realizando mejoras en nuestra web. Volvemos pronto con novedades.
-        </p>
-        <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-          <img 
-            src="/images/logo.png" 
-            alt="Sonido León" 
-            className="h-8 w-auto opacity-60"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function PageContent() {
   const { data } = useCMS();
+  // Con ?previa en la dirección se ve la web completa aunque esté en mantenimiento.
+  const [previa, setPrevia] = useState(false);
+  useEffect(() => {
+    setPrevia(new URLSearchParams(window.location.search).has("previa"));
+  }, []);
 
-  if (data.maintenanceMode) {
-    return <MaintenanceScreen />;
+  if (data.maintenanceMode && !previa) {
+    return <MaintenanceScreen data={data} />;
   }
 
   return (

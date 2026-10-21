@@ -73,6 +73,7 @@ export interface ContactInfo {
 
 export interface CMSData {
   maintenanceMode: boolean;
+  maintenance: { title: string; text: string };
   hero: {
     title: string;
     highlight: string;
@@ -174,6 +175,10 @@ const projectPages: ProjectPageItem[] = (proyectos.items as ProyectoJSON[]).map(
 
 export const defaultData: CMSData = {
   maintenanceMode: Boolean(portada.maintenanceMode),
+  maintenance: {
+    title: portada.maintenance?.title || "Estamos renovando nuestra web",
+    text: portada.maintenance?.text || "Mientras tanto, seguimos trabajando como siempre. Llámanos o escríbenos y te atendemos.",
+  },
   hero: { ...portada.hero, image: portada.hero.image || "/images/hero-bg.jpg" },
   about: portada.about,
   services: {

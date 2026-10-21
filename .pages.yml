@@ -117,8 +117,18 @@ content:
     fields:
       - name: maintenanceMode
         label: Web en mantenimiento
-        description: "¡Ojo! Si lo marcas, la portada muestra solo un aviso de «Sitio en mantenimiento»."
+        description: "¡Ojo! Si lo marcas, la portada muestra solo la pantalla de mantenimiento. Para ver la web completa mientras tanto: sonidoleon.com/?previa"
         type: boolean
+      - name: maintenance
+        label: Pantalla de mantenimiento
+        type: object
+        fields:
+          - name: title
+            label: Título
+            type: string
+          - name: text
+            label: Texto
+            type: text
       - name: hero
         label: Cabecera (lo primero que se ve)
         type: object
