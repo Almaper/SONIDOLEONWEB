@@ -55,6 +55,24 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 #aviso .caja{max-width:340px}
 #aviso h2{font-weight:600;font-size:20px;margin:14px 0 8px}
 #aviso p{color:var(--txt2);font-size:14px;line-height:1.5;margin:0 0 18px}
+.hud{position:absolute;inset:0;display:none;pointer-events:none;padding:12px 16px;justify-content:space-between;align-items:flex-start}
+body.juego .hud{display:flex}
+.hud .pts{font-size:44px;font-weight:600;line-height:1;color:var(--txt)}
+.hud .sub{font-size:12px;color:var(--txt2);margin-top:4px;letter-spacing:.04em}
+.hud .tiempo{font-size:22px;font-weight:600;color:var(--ac);text-align:right}
+.hud .tiempo.urg{color:var(--err)}
+#empezar{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  background:rgba(8,9,12,.78);color:var(--txt);font-size:16px;font-weight:600;text-align:center;padding:0 24px;border:0;width:100%;
+  font-family:inherit;cursor:pointer}
+#empezar small{font-weight:400;font-size:13px;color:var(--txt2)}
+body.juego.parado #empezar{display:flex}
+#final{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:rgba(8,9,12,.82);pointer-events:none;text-align:center}
+#final.on{display:flex}
+#final b{font-size:30px;font-weight:600}
+#final span{font-size:14px;color:var(--txt2)}
+body.juego .solo-dibujo, body.juego #pad .ayuda, body.juego .girar{display:none}
+body:not(.juego) .solo-juego{display:none}
 .girar{color:var(--txt3);font-size:12px;text-align:center;margin-top:10px}
 @media (orientation:landscape) and (max-height:560px){
   body{display:grid;grid-template-columns:1fr 230px;grid-template-rows:auto 1fr;column-gap:14px;padding:8px 14px}
@@ -88,7 +106,11 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 <div id="zona">
   <div id="pad">
     <canvas id="cv"></canvas>
-    <div class="ayuda" id="ayuda"><strong>Desliza el dedo aquí</strong>Lo que dibujes aparece en la fachada</div>
+    <div class="ayuda solo-dibujo" id="ayuda"><strong>Desliza el dedo aquí</strong>Lo que dibujes aparece en la fachada</div>
+    <div class="hud"><div><div class="pts" id="pts">0</div><div class="sub" id="rk">ESTRELLAS</div></div>
+      <div class="tiempo" id="tiempo">60</div></div>
+    <button id="empezar"><span>Toca para empezar</span><small>Inclina el móvil para mover tu bola de luz y atrapa las estrellas</small></button>
+    <div id="final"><b id="fintit">¡Fin de la ronda!</b><span id="fintxt"></span></div>
   </div>
 </div>
 <div class="girar" id="girar">↻ Gira el móvil para jugar en grande</div>
@@ -96,9 +118,13 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 <div class="panel">
   <div class="lbl">TU COLOR</div>
   <div class="colores" id="colores"></div>
-  <div class="acciones">
+  <div class="acciones solo-dibujo">
     <button class="btn" id="agitar">Activar agitar</button>
     <button class="btn ac" id="boom">¡Explosión!</button>
+  </div>
+  <div class="acciones solo-juego">
+    <button class="btn" id="recentrar">Recentrar</button>
+    <button class="btn" id="ayudaJ" disabled>Inclina para mover</button>
   </div>
 </div>
 
@@ -140,6 +166,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
   }
   const BASE = `lumentia/${S}/${C}/`;
   let colorIdx = 0, unido = false, ar = 2.37, ultimoContacto = 0;
+  let modo = "dibujo", giroOK = false, empezado = false, joy = null;
 
   // ---------- colores
   const cont = $("colores");
@@ -185,6 +212,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
   cli.on("message", (topic, payload) => {
     let d; try { d = JSON.parse(payload.toString() || "{}"); } catch (e) { return; }
     ultimoContacto = Date.now();
+    if (d.modo) ponerModo(d.modo);
     if (topic.endsWith("/estado")) {
       if (d.ok === 0) { pill("err", "EN PAUSA"); return; }
       if (d.ef) $("ef").textContent = d.ef;
@@ -203,6 +231,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
     }
     if (d.ef) $("ef").textContent = d.ef;
     if (d.ar) { ar = d.ar; ajustar(); }
+    if (d.pts !== undefined) marcador(d);
   });
   $("avbtn").onclick = () => location.reload();
   setInterval(() => { if (unido) enviar({ k: "h" }); }, 5000);   // sigo aquí
@@ -212,8 +241,9 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
   let dpr = 1;
   function ajustar() {
     const z = $("zona").getBoundingClientRect();
-    let w = z.width, h = w / ar;
-    if (h > z.height) { h = z.height; w = h * ar; }
+    const r = modo === "canicas" ? Math.max(1.0, z.width / z.height) : ar;   // en el juego, zona grande
+    let w = z.width, h = w / r;
+    if (h > z.height) { h = z.height; w = h * r; }
     pad.style.width = w + "px"; pad.style.height = h + "px";
     dpr = Math.min(2, window.devicePixelRatio || 1);
     cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
@@ -231,6 +261,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
   };
   const salida = (p) => ({ x: +p.x.toFixed(4), y: +(1 - p.y).toFixed(4) });   // en la fachada, y hacia arriba
   pad.addEventListener("pointerdown", (e) => {
+    if (modo === "canicas") { if (!giroOK) { joy = norm(e); pad.setPointerCapture(e.pointerId); } return; }
     if (dedo !== null) return;
     dedo = e.pointerId; pad.setPointerCapture(e.pointerId);
     const p = norm(e); trazos.push({ ...p, v: 1, nuevo: true });
@@ -239,6 +270,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
     e.preventDefault();
   });
   pad.addEventListener("pointermove", (e) => {
+    if (modo === "canicas") { if (joy) joy = norm(e); return; }
     if (e.pointerId !== dedo) return;
     const p = norm(e); trazos.push({ ...p, v: 1 });
     pend = p;
@@ -247,6 +279,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
     e.preventDefault();
   });
   const fin = (e) => {
+    joy = null;
     if (e.pointerId !== dedo) return;
     const p = norm(e);
     enviar({ k: "u", ...salida(p) });
@@ -266,6 +299,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
   function dibujar(t) {
     const w = cv.width, h = cv.height;
     ctx.clearRect(0, 0, w, h);
+    if (modo === "canicas") { dibujarNivel(t, w, h); requestAnimationFrame(dibujar); return; }
     ctx.strokeStyle = "rgba(255,255,255,0.04)"; ctx.lineWidth = 1;
     for (let i = 1; i < 8; i++) { const x = (w * i) / 8; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
     for (let i = 1; i < 4; i++) { const y = (h * i) / 4; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
@@ -322,6 +356,88 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
   };
   if (typeof DeviceMotionEvent === "undefined") $("agitar").style.display = "none";
   document.addEventListener("gesturestart", (e) => e.preventDefault());
+
+  // =========================================================== JUEGO: CANICAS (giroscopio)
+  let ori = null, base = null, tilt = { x: 0, y: 0 }, tFinal = 0;
+  function ponerModo(m) {
+    if (m === modo) return;
+    modo = m;
+    document.body.classList.toggle("juego", m === "canicas");
+    setTimeout(ajustar, 0);
+    document.body.classList.toggle("parado", m === "canicas" && !empezado);
+    $("final").classList.remove("on");
+  }
+  window.addEventListener("deviceorientation", (e) => {
+    if (e.beta === null || e.gamma === null) return;
+    ori = { b: e.beta, g: e.gamma };
+    if (!giroOK) { giroOK = true; base = { ...ori }; }
+  });
+  function anguloPantalla() {
+    if (screen.orientation && typeof screen.orientation.angle === "number") return screen.orientation.angle;
+    return (window.orientation || 0);
+  }
+  function calcTilt() {
+    if (giroOK && ori && base) {
+      const K = 28;                                   // grados para inclinación máxima
+      const dx = (ori.g - base.g) / K, dy = -(ori.b - base.b) / K;   // ejes del móvil (dy>0: borde de arriba hacia abajo)
+      // como una bandeja: la bola rueda hacia el lado que bajas
+      let x = dx, y = dy;
+      const a = ((anguloPantalla() % 360) + 360) % 360;
+      if (a === 90) { x = -dy; y = dx; }              // en horizontal, girado a la izquierda
+      else if (a === 270) { x = dy; y = -dx; }        // en horizontal, girado a la derecha
+      else if (a === 180) { x = -dx; y = -dy; }
+      tilt = { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, y)) };
+    } else if (joy) {
+      tilt = { x: Math.max(-1, Math.min(1, (joy.x - 0.5) * 2.4)), y: Math.max(-1, Math.min(1, (0.5 - joy.y) * 2.4)) };
+    } else if (!giroOK) {
+      tilt = { x: 0, y: 0 };
+    }
+  }
+  setInterval(() => {
+    if (modo !== "canicas" || !empezado || !unido) return;
+    calcTilt();
+    enviar({ k: "t", x: +tilt.x.toFixed(3), y: +tilt.y.toFixed(3) });
+  }, 50);
+  $("empezar").onclick = async () => {
+    try {
+      if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+        await DeviceOrientationEvent.requestPermission();         // iPhone: pide permiso
+      }
+    } catch (e) {}
+    empezado = true;
+    document.body.classList.remove("parado");
+    base = ori ? { ...ori } : null;
+    if (!giroOK) $("ayudaJ").textContent = "Arrastra el dedo";
+  };
+  $("recentrar").onclick = () => { if (ori) base = { ...ori }; if (navigator.vibrate) navigator.vibrate(20); };
+  function marcador(d) {
+    $("pts").textContent = d.pts;
+    if (d.rk) $("rk").textContent = `PUESTO ${d.rk} DE ${d.nj}`;
+    if (d.t !== undefined) { $("tiempo").textContent = d.t; $("tiempo").classList.toggle("urg", d.t <= 10); }
+    if (d.star && navigator.vibrate) navigator.vibrate(d.star > 1 ? [30, 40, 30] : 30);
+    if (d.fin && d.rk && Date.now() - tFinal > 6000) {
+      tFinal = Date.now();
+      $("fintit").textContent = d.rk === 1 && d.pts > 0 ? "¡Has ganado!" : `Puesto ${d.rk}`;
+      $("fintxt").textContent = `${d.pts} estrella${d.pts === 1 ? "" : "s"} · nueva ronda en unos segundos`;
+      $("final").classList.add("on");
+      if (navigator.vibrate) navigator.vibrate(d.rk === 1 ? [80, 60, 80, 60, 200] : 120);
+      setTimeout(() => $("final").classList.remove("on"), 4500);
+    }
+  }
+  function dibujarNivel(t, w, h) {
+    // nivel de burbuja: el punto muestra hacia dónde rueda tu bola
+    calcTilt();
+    const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.38;
+    const col = colorCss(t);
+    ctx.strokeStyle = "rgba(255,255,255,0.08)"; ctx.lineWidth = 1.5 * dpr;
+    for (const k of [1, 0.66, 0.33]) { ctx.beginPath(); ctx.arc(cx, cy, R * k, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy); ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R); ctx.stroke();
+    const bx = cx + tilt.x * R, by = cy - tilt.y * R;
+    ctx.shadowColor = col; ctx.shadowBlur = 30 * dpr; ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(bx, by, R * 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0; ctx.fillStyle = "rgba(255,255,255,.85)";
+    ctx.beginPath(); ctx.arc(bx - R * 0.06, by - R * 0.06, R * 0.06, 0, Math.PI * 2); ctx.fill();
+  }
 })();
 </script>
 </body>
