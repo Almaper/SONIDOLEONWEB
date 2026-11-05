@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0c10">
+<title>LUMENTIA · Juega</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0c10; --bg2:#13151c; --line:rgba(255,255,255,.09); --txt:#f0f2f7; --txt2:#969ba8; --txt3:#6a6f7c;
+  --ac:#ffb042; --ac2:#ff8a29; --ok:#78e68c; --err:#ff7a6e;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body{display:flex;flex-direction:column;min-height:100dvh;padding:calc(10px + env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom));
+  background:radial-gradient(120% 60% at 50% 0%,#191b24 0%,var(--bg) 60%)}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 2px 12px}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;letter-spacing:.04em;white-space:nowrap}
+.logo b{font-weight:600}.logo span{font-weight:300;color:var(--ac)}
+.logo svg{width:34px;height:27px;flex:none}
+.pill{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--txt2);
+  padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);white-space:nowrap}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--txt3);flex:none}
+.pill.ok i{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.pill.wait i{background:var(--ac);animation:lat 1s infinite}
+.pill.err i{background:var(--err)}
+@keyframes lat{50%{opacity:.3}}
+.info{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--txt2);padding:0 2px 8px}
+.info b{color:var(--txt);font-weight:600}
+#zona{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+#pad{position:relative;width:100%;border-radius:18px;border:1px solid var(--line);overflow:hidden;touch-action:none;
+  background:linear-gradient(180deg,#0e1016,#151821);box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.02)}
+#pad canvas{position:absolute;inset:0;width:100%;height:100%}
+#pad .ayuda{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  color:var(--txt3);font-size:13px;text-align:center;pointer-events:none;transition:opacity .4s;padding:0 20px}
+#pad .ayuda strong{color:var(--txt2);font-weight:500;font-size:15px}
+.panel{margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}
+.lbl{font-size:10px;font-weight:600;letter-spacing:.12em;color:var(--txt2);margin-bottom:10px}
+.colores{display:grid;grid-template-columns:repeat(9,1fr);gap:8px}
+.colores button{aspect-ratio:1;border-radius:50%;border:0;padding:0;cursor:pointer;position:relative}
+.colores button.on::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 12px rgba(255,176,66,.5)}
+.acciones{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.btn{height:52px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt);
+  font:500 15px Inter,system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn.ac{background:linear-gradient(160deg,var(--ac),var(--ac2));color:#1a1206;border:0;font-weight:600}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.45}
+#aviso{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:28px;background:rgba(6,7,10,.86);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:5;text-align:center}
+#aviso.on{display:flex}
+#aviso .caja{max-width:340px}
+#aviso h2{font-weight:600;font-size:20px;margin:14px 0 8px}
+#aviso p{color:var(--txt2);font-size:14px;line-height:1.5;margin:0 0 18px}
+.girar{color:var(--txt3);font-size:12px;text-align:center;margin-top:10px}
+@media (orientation:landscape) and (max-height:560px){
+  body{display:grid;grid-template-columns:1fr 230px;grid-template-rows:auto 1fr;column-gap:14px;padding:8px 14px}
+  header{grid-column:1/3;padding:0 2px 6px}
+  .info{display:none}
+  #zona{grid-column:1;grid-row:2}
+  .panel{grid-column:2;grid-row:2;margin-top:0;align-self:center;padding:12px}
+  .colores{grid-template-columns:repeat(5,1fr);gap:7px}
+  .acciones{grid-template-columns:1fr;gap:8px;margin-top:10px}
+  .btn{height:44px;font-size:14px}
+  .girar{display:none}
+  .logo{font-size:15px}
+}
+.yo{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:0}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 80 64" aria-hidden="true"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#FFB042" stop-opacity=".6"/><stop offset="1" stop-color="#FFB042" stop-opacity=".05"/></linearGradient></defs>
+      <path d="M12 32 L52 13 L52 51 Z" fill="url(#g)"/><path d="M12 32 L52 13 M12 32 L52 51" stroke="#FFB042" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+      <rect x="52" y="10" width="5" height="44" rx="2.5" fill="#F0F2F7"/><circle cx="12" cy="32" r="5.5" fill="#FFB042"/>
+      <circle cx="66" cy="21" r="2.6" fill="#FFB042"/><circle cx="72.5" cy="31.5" r="1.8" fill="#F0F2F7"/><circle cx="66" cy="42" r="2.2" fill="#FFB042"/></svg>
+    <div><b>LUMENTIA</b> <span>SHOW</span></div>
+  </div>
+  <div id="pill" class="pill wait"><i></i><span id="pilltxt">CONECTANDO</span></div>
+</header>
+
+<div class="info"><div><span class="yo" id="yo"></span>Jugador <b id="num">–</b></div><div>Efecto: <b id="ef">–</b></div></div>
+
+<div id="zona">
+  <div id="pad">
+    <canvas id="cv"></canvas>
+    <div class="ayuda" id="ayuda"><strong>Desliza el dedo aquí</strong>Lo que dibujes aparece en la fachada</div>
+  </div>
+</div>
+<div class="girar" id="girar">↻ Gira el móvil para jugar en grande</div>
+
+<div class="panel">
+  <div class="lbl">TU COLOR</div>
+  <div class="colores" id="colores"></div>
+  <div class="acciones">
+    <button class="btn" id="agitar">Activar agitar</button>
+    <button class="btn ac" id="boom">¡Explosión!</button>
+  </div>
+</div>
+
+<div id="aviso"><div class="caja">
+  <svg viewBox="0 0 80 64" width="64" height="52" aria-hidden="true"><path d="M12 32 L52 13 L52 51 Z" fill="#FFB042" fill-opacity=".25"/><rect x="52" y="10" width="5" height="44" rx="2.5" fill="#F0F2F7"/><circle cx="12" cy="32" r="5.5" fill="#FFB042"/></svg>
+  <h2 id="avtit">Escanea el código</h2>
+  <p id="avtxt">Apunta con la cámara del móvil al código QR que aparece en la proyección.</p>
+  <button class="btn ac" id="avbtn" style="display:none;width:100%">Reintentar</button>
+</div></div>
+
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script>
+(() => {
+  "use strict";
+  // Colores: mismo orden que la paleta de LUMENTIA SHOW (el 8 es arcoíris)
+  const PALETA = ["#ffa838", "#fff0d6", "#ff3d33", "#ff3da8", "#9e5cff", "#3d80ff", "#33e6ff", "#5cff75", null];
+  const q = new URLSearchParams(location.search);
+  const S = q.get("s") || "", C = (q.get("c") || "").toUpperCase();
+  const BROKER = q.get("b") || "wss://broker.emqx.io:8084/mqtt";
+  const $ = (id) => document.getElementById(id);
+  const aviso = (tit, txt, reintentar) => {
+    $("avtit").textContent = tit; $("avtxt").textContent = txt;
+    $("avbtn").style.display = reintentar ? "" : "none"; $("aviso").classList.add("on");
+  };
+  const quitarAviso = () => $("aviso").classList.remove("on");
+  const pill = (cls, t) => { $("pill").className = "pill " + cls; $("pilltxt").textContent = t; };
+
+  if (!/^[a-z0-9_-]{4,24}$/i.test(S) || !/^[A-Z0-9]{4}$/.test(C)) {
+    aviso("Escanea el código", "Apunta con la cámara del móvil al código QR que aparece en la proyección.");
+    pill("err", "SIN CÓDIGO");
+    return;
+  }
+  // identificador del jugador (se recuerda para mantener el color si recarga)
+  let PID = null;
+  try { PID = localStorage.getItem("lumentia_pid"); } catch (e) {}
+  if (!PID || !/^[A-Za-z0-9_-]{4,24}$/.test(PID)) {
+    PID = "p" + Math.random().toString(36).slice(2, 12);
+    try { localStorage.setItem("lumentia_pid", PID); } catch (e) {}
+  }
+  const BASE = `lumentia/${S}/${C}/`;
+  let colorIdx = 0, unido = false, ar = 2.37, ultimoContacto = 0;
+
+  // ---------- colores
+  const cont = $("colores");
+  PALETA.forEach((c, i) => {
+    const b = document.createElement("button");
+    b.style.background = c || "conic-gradient(#ff3d33,#ffd23d,#5cff75,#33e6ff,#9e5cff,#ff3da8,#ff3d33)";
+    b.setAttribute("aria-label", "Color " + (i + 1));
+    b.onclick = () => { ponerColor(i); enviar({ k: "c", i }); };
+    cont.appendChild(b);
+  });
+  function ponerColor(i) {
+    colorIdx = i;
+    [...cont.children].forEach((b, j) => b.classList.toggle("on", j === i));
+    $("yo").style.background = PALETA[i] || "conic-gradient(#ff3d33,#5cff75,#33e6ff,#ff3da8,#ff3d33)";
+  }
+  ponerColor(0);
+  const colorCss = (t) => PALETA[colorIdx] || `hsl(${(t * 0.05) % 360} 100% 60%)`;
+
+  // ---------- conexión
+  const cli = mqtt.connect(BROKER, {
+    clientId: "lm_" + PID + "_" + Math.random().toString(36).slice(2, 6),
+    clean: true, keepalive: 30, reconnectPeriod: 2000, connectTimeout: 8000
+  });
+  function enviar(o) {
+    if (!cli.connected) return;
+    o.p = PID;
+    cli.publish(BASE + "in", JSON.stringify(o), { qos: 0 });
+  }
+  cli.on("connect", () => {
+    pill("wait", "BUSCANDO");
+    cli.subscribe([BASE + "estado", BASE + "out/" + PID], { qos: 0 });
+    enviar({ k: "j" });
+    setTimeout(() => {
+      if (!unido) {
+        aviso("No encuentro la instalación", "Puede que el código haya caducado o que el espectáculo esté apagado. Vuelve a escanear el QR de la proyección.", true);
+        pill("err", "SIN RESPUESTA");
+      }
+    }, 7000);
+  });
+  cli.on("reconnect", () => pill("wait", "RECONECTANDO"));
+  cli.on("offline", () => pill("err", "SIN CONEXIÓN"));
+  cli.on("error", () => pill("err", "SIN CONEXIÓN"));
+  cli.on("message", (topic, payload) => {
+    let d; try { d = JSON.parse(payload.toString() || "{}"); } catch (e) { return; }
+    ultimoContacto = Date.now();
+    if (topic.endsWith("/estado")) {
+      if (d.ok === 0) { pill("err", "EN PAUSA"); return; }
+      if (d.ef) $("ef").textContent = d.ef;
+      if (d.ar) { ar = d.ar; ajustar(); }
+      if (unido) pill(d.pausa ? "wait" : "ok", d.pausa ? "EN PAUSA" : "EN VIVO");
+      return;
+    }
+    if (d.caducado) { unido = false; aviso("El código ha caducado", "Vuelve a escanear el QR que aparece ahora en la proyección.", true); pill("err", "CADUCADO"); return; }
+    if (d.fuera) { unido = false; aviso("Sesión terminada", "Gracias por jugar. Escanea el QR de la proyección para volver a entrar.", true); pill("err", "FUERA"); return; }
+    if (d.lleno) { aviso("Hay muchos jugadores", "Espera un momento: entrarás en cuanto quede un hueco libre.", false); pill("wait", "EN ESPERA");
+      setTimeout(() => enviar({ k: "j" }), 4000); return; }
+    if (d.col !== undefined) {
+      unido = true; quitarAviso(); pill("ok", "EN VIVO");
+      if (d.num) $("num").textContent = d.num;
+      ponerColor(d.col | 0);
+    }
+    if (d.ef) $("ef").textContent = d.ef;
+    if (d.ar) { ar = d.ar; ajustar(); }
+  });
+  $("avbtn").onclick = () => location.reload();
+  setInterval(() => { if (unido) enviar({ k: "h" }); }, 5000);   // sigo aquí
+
+  // ---------- zona táctil (con la misma proporción que la proyección)
+  const pad = $("pad"), cv = $("cv"), ctx = cv.getContext("2d");
+  let dpr = 1;
+  function ajustar() {
+    const z = $("zona").getBoundingClientRect();
+    let w = z.width, h = w / ar;
+    if (h > z.height) { h = z.height; w = h * ar; }
+    pad.style.width = w + "px"; pad.style.height = h + "px";
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  }
+  window.addEventListener("resize", ajustar);
+  window.addEventListener("orientationchange", () => setTimeout(ajustar, 250));
+  ajustar();
+
+  const trazos = [];      // puntos con vida para el rastro local
+  let dedo = null, pend = null, tEnvio = 0;
+  const norm = (e) => {
+    const r = cv.getBoundingClientRect();
+    return { x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)),
+             y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)) };
+  };
+  const salida = (p) => ({ x: +p.x.toFixed(4), y: +(1 - p.y).toFixed(4) });   // en la fachada, y hacia arriba
+  pad.addEventListener("pointerdown", (e) => {
+    if (dedo !== null) return;
+    dedo = e.pointerId; pad.setPointerCapture(e.pointerId);
+    const p = norm(e); trazos.push({ ...p, v: 1, nuevo: true });
+    $("ayuda").style.opacity = 0;
+    enviar({ k: "d", ...salida(p) }); tEnvio = performance.now();
+    e.preventDefault();
+  });
+  pad.addEventListener("pointermove", (e) => {
+    if (e.pointerId !== dedo) return;
+    const p = norm(e); trazos.push({ ...p, v: 1 });
+    pend = p;
+    const t = performance.now();
+    if (t - tEnvio > 40) { enviar({ k: "m", ...salida(p) }); tEnvio = t; pend = null; }
+    e.preventDefault();
+  });
+  const fin = (e) => {
+    if (e.pointerId !== dedo) return;
+    const p = norm(e);
+    enviar({ k: "u", ...salida(p) });
+    dedo = null; pend = null;
+  };
+  pad.addEventListener("pointerup", fin);
+  pad.addEventListener("pointercancel", fin);
+  setInterval(() => {      // último movimiento pendiente y "sigo tocando" aunque el dedo esté quieto
+    if (dedo === null) return;
+    const t = performance.now();
+    if (pend) { enviar({ k: "m", ...salida(pend) }); pend = null; tEnvio = t; }
+    else if (t - tEnvio > 400 && trazos.length) {
+      const u = trazos[trazos.length - 1]; enviar({ k: "m", ...salida(u) }); tEnvio = t;
+    }
+  }, 50);
+
+  function dibujar(t) {
+    const w = cv.width, h = cv.height;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = "rgba(255,255,255,0.04)"; ctx.lineWidth = 1;
+    for (let i = 1; i < 8; i++) { const x = (w * i) / 8; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    for (let i = 1; i < 4; i++) { const y = (h * i) / 4; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    const col = colorCss(t);
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    for (let i = 1; i < trazos.length; i++) {
+      const a = trazos[i - 1], b = trazos[i];
+      if (b.nuevo) continue;
+      ctx.globalAlpha = b.v * 0.9; ctx.strokeStyle = col; ctx.lineWidth = (4 + 10 * b.v) * dpr;
+      ctx.shadowColor = col; ctx.shadowBlur = 18 * dpr * b.v;
+      ctx.beginPath(); ctx.moveTo(a.x * w, a.y * h); ctx.lineTo(b.x * w, b.y * h); ctx.stroke();
+    }
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    for (const p of trazos) p.v -= 0.018;
+    while (trazos.length && trazos[0].v <= 0) trazos.shift();
+    if (dedo !== null && trazos.length) {
+      const u = trazos[trazos.length - 1];
+      ctx.strokeStyle = col; ctx.lineWidth = 2 * dpr;
+      ctx.beginPath(); ctx.arc(u.x * w, u.y * h, 22 * dpr, 0, Math.PI * 2); ctx.stroke();
+    }
+    requestAnimationFrame(dibujar);
+  }
+  requestAnimationFrame(dibujar);
+
+  // ---------- explosión (botón o agitando el móvil)
+  let tBoom = 0;
+  function boom(f) {
+    const t = performance.now();
+    if (t - tBoom < 450) return;
+    tBoom = t;
+    enviar({ k: "s", f: +f.toFixed(2) });
+    if (navigator.vibrate) navigator.vibrate(40);
+    pad.animate([{ boxShadow: `0 0 0 3px ${colorCss(t)}` }, { boxShadow: "0 0 0 0 transparent" }], { duration: 500 });
+  }
+  $("boom").onclick = () => boom(1.5);
+  function escucharMovimiento() {
+    window.addEventListener("devicemotion", (e) => {
+      const a = e.acceleration && e.acceleration.x !== null ? e.acceleration : null;
+      let m;
+      if (a) m = Math.hypot(a.x || 0, a.y || 0, a.z || 0);
+      else { const g = e.accelerationIncludingGravity || {}; m = Math.abs(Math.hypot(g.x || 0, g.y || 0, g.z || 0) - 9.81); }
+      if (m > 16) boom(Math.min(3, 0.6 + (m - 16) / 10));
+    });
+    $("agitar").textContent = "Agitar activado"; $("agitar").disabled = true;
+  }
+  $("agitar").onclick = async () => {
+    try {
+      if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+        const r = await DeviceMotionEvent.requestPermission();      // iPhone: pide permiso
+        if (r !== "granted") { $("agitar").textContent = "Sin permiso"; return; }
+      }
+      escucharMovimiento();
+    } catch (e) { $("agitar").textContent = "No disponible"; }
+  };
+  if (typeof DeviceMotionEvent === "undefined") $("agitar").style.display = "none";
+  document.addEventListener("gesturestart", (e) => e.preventDefault());
+})();
+</script>
+</body>
+</html>
