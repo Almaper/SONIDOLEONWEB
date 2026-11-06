@@ -38,55 +38,56 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 #pad .ayuda{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
   color:var(--txt3);font-size:13px;text-align:center;pointer-events:none;transition:opacity .4s;padding:0 20px}
 #pad .ayuda strong{color:var(--txt2);font-weight:500;font-size:15px}
-.panel{margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}
-.lbl{font-size:10px;font-weight:600;letter-spacing:.12em;color:var(--txt2);margin-bottom:10px}
-.colores{display:grid;grid-template-columns:repeat(9,1fr);gap:8px}
-.colores button{aspect-ratio:1;border-radius:50%;border:0;padding:0;cursor:pointer;position:relative}
-.colores button.on::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 12px rgba(255,176,66,.5)}
-.acciones{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.btn{height:52px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt);
-  font:500 15px Inter,system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn.ac{background:linear-gradient(160deg,var(--ac),var(--ac2));color:#1a1206;border:0;font-weight:600}
+.acciones{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.btn{height:64px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--txt);
+  font:600 17px Inter,system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn.ac{background:linear-gradient(160deg,var(--ac),var(--ac2));color:#1a1206;border:0}
 .btn:active{transform:scale(.97)}
 .btn[disabled]{opacity:.45}
 #aviso{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:28px;background:rgba(6,7,10,.86);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:5;text-align:center}
 #aviso.on{display:flex}
 #aviso .caja{max-width:340px}
-#aviso h2{font-weight:600;font-size:20px;margin:14px 0 8px}
-#aviso p{color:var(--txt2);font-size:14px;line-height:1.5;margin:0 0 18px}
-.hud{position:absolute;inset:0;display:none;pointer-events:none;padding:12px 16px;justify-content:space-between;align-items:flex-start}
+#aviso h2{font-weight:600;font-size:22px;margin:14px 0 8px}
+#aviso p{color:var(--txt2);font-size:15px;line-height:1.5;margin:0 0 18px}
+/* insignia del jugador: su color, bien visible */
+.yo{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:999px;font-weight:600;font-size:15px;
+  letter-spacing:.06em;color:#14100a;background:var(--col,#ffb042);box-shadow:0 0 24px color-mix(in srgb,var(--col,#ffb042) 45%,transparent)}
+.yo i{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 3px rgba(0,0,0,.15)}
+.info{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 0 10px}
+.info .ef{font-size:13px;color:var(--txt2);text-align:right}.info .ef b{color:var(--txt);font-weight:600}
+/* juego */
+.hud{position:absolute;inset:0;display:none;pointer-events:none;padding:14px 18px;justify-content:space-between;align-items:flex-start}
 body.juego .hud{display:flex}
-.hud .pts{font-size:44px;font-weight:600;line-height:1;color:var(--txt)}
-.hud .sub{font-size:12px;color:var(--txt2);margin-top:4px;letter-spacing:.04em}
-.hud .tiempo{font-size:22px;font-weight:600;color:var(--ac);text-align:right}
-.hud .tiempo.urg{color:var(--err)}
-#empezar{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  background:rgba(8,9,12,.78);color:var(--txt);font-size:16px;font-weight:600;text-align:center;padding:0 24px;border:0;width:100%;
-  font-family:inherit;cursor:pointer}
-#empezar small{font-weight:400;font-size:13px;color:var(--txt2)}
+.hud .pts{font-size:72px;font-weight:600;line-height:.95;color:var(--txt)}
+.hud .sub{font-size:14px;font-weight:600;color:var(--txt2);margin-top:6px;letter-spacing:.06em}
+.hud .tiempo{font-size:44px;font-weight:600;line-height:1;color:var(--ac);text-align:right}
+.hud .tiempo small{display:block;font-size:12px;letter-spacing:.1em;color:var(--txt2);margin-top:4px}
+.hud #tiempo.urg{color:var(--err)}
+#empezar{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  background:rgba(8,9,12,.8);color:var(--txt);font-size:24px;font-weight:600;text-align:center;padding:0 28px;border:0;width:100%;
+  font-family:inherit;cursor:pointer;z-index:2}
+#empezar small{font-weight:400;font-size:16px;color:var(--txt2);line-height:1.45}
 body.juego.parado #empezar{display:flex}
-#final{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  background:rgba(8,9,12,.82);pointer-events:none;text-align:center}
+#final{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  background:rgba(8,9,12,.85);pointer-events:none;text-align:center;z-index:2}
 #final.on{display:flex}
-#final b{font-size:30px;font-weight:600}
-#final span{font-size:14px;color:var(--txt2)}
+#final b{font-size:40px;font-weight:600}
+#final span{font-size:16px;color:var(--txt2)}
 body.juego .solo-dibujo, body.juego #pad .ayuda, body.juego .girar{display:none}
 body:not(.juego) .solo-juego{display:none}
-.girar{color:var(--txt3);font-size:12px;text-align:center;margin-top:10px}
+body.juego .acciones{grid-template-columns:1fr}
+.girar{color:var(--txt3);font-size:13px;text-align:center;margin-top:10px}
 @media (orientation:landscape) and (max-height:560px){
-  body{display:grid;grid-template-columns:1fr 230px;grid-template-rows:auto 1fr;column-gap:14px;padding:8px 14px}
-  header{grid-column:1/3;padding:0 2px 6px}
-  .info{display:none}
+  body{display:grid;grid-template-columns:1fr 200px;grid-template-rows:auto 1fr;column-gap:12px;padding:8px 12px}
+  header{display:none}
+  .info{grid-column:1/3;padding:0 0 8px}
   #zona{grid-column:1;grid-row:2}
-  .panel{grid-column:2;grid-row:2;margin-top:0;align-self:center;padding:12px}
-  .colores{grid-template-columns:repeat(5,1fr);gap:7px}
-  .acciones{grid-template-columns:1fr;gap:8px;margin-top:10px}
-  .btn{height:44px;font-size:14px}
+  .acciones{grid-column:2;grid-row:2;grid-template-columns:1fr;align-content:center;margin-top:0;gap:12px}
+  .btn{height:72px}
   .girar{display:none}
-  .logo{font-size:15px}
+  .hud .pts{font-size:64px}
 }
-.yo{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:0}
 </style>
 </head>
 <body>
@@ -101,31 +102,27 @@ body:not(.juego) .solo-juego{display:none}
   <div id="pill" class="pill wait"><i></i><span id="pilltxt">CONECTANDO</span></div>
 </header>
 
-<div class="info"><div><span class="yo" id="yo"></span>Jugador <b id="num">–</b></div><div>Efecto: <b id="ef">–</b></div></div>
+<div class="info"><div class="yo" id="yo"><i></i><span>JUGADOR <span id="num">–</span></span></div>
+  <div class="ef">Efecto<br><b id="ef">–</b></div></div>
 
 <div id="zona">
   <div id="pad">
     <canvas id="cv"></canvas>
     <div class="ayuda solo-dibujo" id="ayuda"><strong>Desliza el dedo aquí</strong>Lo que dibujes aparece en la fachada</div>
     <div class="hud"><div><div class="pts" id="pts">0</div><div class="sub" id="rk">ESTRELLAS</div></div>
-      <div class="tiempo" id="tiempo">60</div></div>
-    <button id="empezar"><span>Toca para empezar</span><small>Inclina el móvil para mover tu bola de luz y atrapa las estrellas</small></button>
+      <div class="tiempo"><span id="tiempo">60</span><small>SEGUNDOS</small></div></div>
+    <button id="empezar"><span>Toca para empezar</span><small>Inclina el móvil para mover tu bola de luz<br>y atrapa las estrellas</small></button>
     <div id="final"><b id="fintit">¡Fin de la ronda!</b><span id="fintxt"></span></div>
   </div>
 </div>
 <div class="girar" id="girar">↻ Gira el móvil para jugar en grande</div>
 
-<div class="panel">
-  <div class="lbl">TU COLOR</div>
-  <div class="colores" id="colores"></div>
-  <div class="acciones solo-dibujo">
-    <button class="btn" id="agitar">Activar agitar</button>
-    <button class="btn ac" id="boom">¡Explosión!</button>
-  </div>
-  <div class="acciones solo-juego">
-    <button class="btn" id="recentrar">Recentrar</button>
-    <button class="btn" id="ayudaJ" disabled>Inclina para mover</button>
-  </div>
+<div class="acciones solo-dibujo">
+  <button class="btn" id="agitar">Activar agitar</button>
+  <button class="btn ac" id="boom">¡Explosión!</button>
+</div>
+<div class="acciones solo-juego">
+  <button class="btn" id="recentrar">Recentrar</button>
 </div>
 
 <div id="aviso"><div class="caja">
@@ -168,19 +165,12 @@ body:not(.juego) .solo-juego{display:none}
   let colorIdx = 0, unido = false, ar = 2.37, ultimoContacto = 0;
   let modo = "dibujo", giroOK = false, empezado = false, joy = null;
 
-  // ---------- colores
-  const cont = $("colores");
-  PALETA.forEach((c, i) => {
-    const b = document.createElement("button");
-    b.style.background = c || "conic-gradient(#ff3d33,#ffd23d,#5cff75,#33e6ff,#9e5cff,#ff3da8,#ff3d33)";
-    b.setAttribute("aria-label", "Color " + (i + 1));
-    b.onclick = () => { ponerColor(i); enviar({ k: "c", i }); };
-    cont.appendChild(b);
-  });
+  // ---------- color del jugador: lo asigna LUMENTIA (no se puede cambiar)
   function ponerColor(i) {
     colorIdx = i;
-    [...cont.children].forEach((b, j) => b.classList.toggle("on", j === i));
-    $("yo").style.background = PALETA[i] || "conic-gradient(#ff3d33,#5cff75,#33e6ff,#ff3da8,#ff3d33)";
+    const c = PALETA[i] || "#ffb042";
+    $("yo").style.setProperty("--col", c);
+    if (!PALETA[i]) $("yo").style.background = "linear-gradient(90deg,#ff3d33,#ffd23d,#5cff75,#33e6ff,#9e5cff,#ff3da8)";
   }
   ponerColor(0);
   const colorCss = (t) => PALETA[colorIdx] || `hsl(${(t * 0.05) % 360} 100% 60%)`;
@@ -241,9 +231,9 @@ body:not(.juego) .solo-juego{display:none}
   let dpr = 1;
   function ajustar() {
     const z = $("zona").getBoundingClientRect();
-    const r = modo === "canicas" ? Math.max(1.0, z.width / z.height) : ar;   // en el juego, zona grande
-    let w = z.width, h = w / r;
-    if (h > z.height) { h = z.height; w = h * r; }
+    let w = z.width, h = w / ar;
+    if (h > z.height) { h = z.height; w = h * ar; }
+    if (modo === "canicas") { w = z.width; h = z.height; }       // en el juego, toda la pantalla
     pad.style.width = w + "px"; pad.style.height = h + "px";
     dpr = Math.min(2, window.devicePixelRatio || 1);
     cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
@@ -407,7 +397,6 @@ body:not(.juego) .solo-juego{display:none}
     empezado = true;
     document.body.classList.remove("parado");
     base = ori ? { ...ori } : null;
-    if (!giroOK) $("ayudaJ").textContent = "Arrastra el dedo";
   };
   $("recentrar").onclick = () => { if (ori) base = { ...ori }; if (navigator.vibrate) navigator.vibrate(20); };
   function marcador(d) {
@@ -425,18 +414,48 @@ body:not(.juego) .solo-juego{display:none}
     }
   }
   function dibujarNivel(t, w, h) {
-    // nivel de burbuja: el punto muestra hacia dónde rueda tu bola
+    // flechas: hacia dónde rueda tu bola y con cuánta fuerza
     calcTilt();
-    const cx = w / 2, cy = h / 2, R = Math.min(w, h) * 0.38;
     const col = colorCss(t);
-    ctx.strokeStyle = "rgba(255,255,255,0.08)"; ctx.lineWidth = 1.5 * dpr;
-    for (const k of [1, 0.66, 0.33]) { ctx.beginPath(); ctx.arc(cx, cy, R * k, 0, Math.PI * 2); ctx.stroke(); }
-    ctx.beginPath(); ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy); ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R); ctx.stroke();
-    const bx = cx + tilt.x * R, by = cy - tilt.y * R;
-    ctx.shadowColor = col; ctx.shadowBlur = 30 * dpr; ctx.fillStyle = col;
-    ctx.beginPath(); ctx.arc(bx, by, R * 0.2, 0, Math.PI * 2); ctx.fill();
+    const cx = w / 2, cy = h * 0.56, R = Math.min(w * 0.42, h * 0.36);
+    const fx = tilt.x, fy = -tilt.y;                 // en pantalla, y hacia abajo
+    const fuerza = Math.min(1, Math.hypot(fx, fy));
+    // cuatro flechas fijas: se encienden según la dirección
+    const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+    for (const [dx, dy] of dirs) {
+      const k = Math.max(0, fx * dx + fy * dy);      // cuánto apunta la inclinación hacia esta flecha
+      const px = cx + dx * R * 0.95, py = cy + dy * R * 0.95;
+      chevron(px, py, Math.atan2(dy, dx), R * 0.34, k > 0.08 ? col : "rgba(255,255,255,0.13)", 0.25 + 0.75 * k, k);
+    }
+    // flecha grande central: dirección exacta del movimiento
+    if (fuerza > 0.08) {
+      const ang = Math.atan2(fy, fx), L = R * (0.25 + 0.55 * fuerza);
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang);
+      ctx.shadowColor = col; ctx.shadowBlur = 30 * dpr * fuerza;
+      ctx.fillStyle = col; ctx.globalAlpha = 0.55 + 0.45 * fuerza;
+      const g = R * 0.11, cab = R * 0.3;
+      ctx.beginPath();
+      ctx.moveTo(-R * 0.05, -g); ctx.lineTo(L - cab, -g); ctx.lineTo(L - cab, -cab * 0.75);
+      ctx.lineTo(L, 0); ctx.lineTo(L - cab, cab * 0.75); ctx.lineTo(L - cab, g); ctx.lineTo(-R * 0.05, g);
+      ctx.closePath(); ctx.fill();
+      ctx.restore(); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    }
+    // la canica en el centro
+    ctx.shadowColor = col; ctx.shadowBlur = 26 * dpr; ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.17, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur = 0; ctx.fillStyle = "rgba(255,255,255,.85)";
-    ctx.beginPath(); ctx.arc(bx - R * 0.06, by - R * 0.06, R * 0.06, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx - R * 0.05, cy - R * 0.05, R * 0.05, 0, Math.PI * 2); ctx.fill();
+    // texto de ayuda abajo
+    ctx.fillStyle = "rgba(255,255,255,0.45)"; ctx.font = `500 ${Math.round(14 * dpr)}px Inter, system-ui, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillText(fuerza > 0.08 ? (fuerza > 0.85 ? "¡A TOPE!" : "") : "QUIETA · INCLINA EL MÓVIL", cx, h - 16 * dpr);
+  }
+  function chevron(x, y, ang, s, color, alfa, brillo) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
+    ctx.globalAlpha = alfa; ctx.strokeStyle = color; ctx.lineWidth = s * 0.28; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.shadowColor = color; ctx.shadowBlur = 24 * dpr * brillo;
+    ctx.beginPath(); ctx.moveTo(-s * 0.35, -s * 0.6); ctx.lineTo(s * 0.35, 0); ctx.lineTo(-s * 0.35, s * 0.6); ctx.stroke();
+    ctx.restore(); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
   }
 })();
 </script>
