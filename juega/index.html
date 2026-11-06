@@ -78,6 +78,28 @@ body.juego .solo-dibujo, body.juego #pad .ayuda, body.juego .girar{display:none}
 body:not(.juego) .solo-juego{display:none}
 body.juego .acciones{grid-template-columns:1fr}
 .girar{color:var(--txt3);font-size:13px;text-align:center;margin-top:10px}
+/* pong */
+body.pong .solo-dibujo, body.pong #pad .ayuda, body.pong .girar, body.pong .solo-juego{display:none}
+.phud{position:absolute;inset:0;display:none;pointer-events:none;flex-direction:column;align-items:center;padding:14px 16px}
+body.pong .phud{display:flex}
+.marc{display:flex;align-items:center;gap:18px;font-weight:600}
+.marc .g{font-size:76px;line-height:1}
+.marc{gap:26px}
+.marc .lado{display:flex;flex-direction:column;align-items:center}
+.marc .et{font-size:13px;color:var(--txt2);letter-spacing:.12em;margin-top:2px}
+.marc .vs{font-size:10px;color:var(--txt3);letter-spacing:.1em;text-align:center;line-height:1.5}
+.marc .vs b{display:block;font-size:26px;color:var(--txt);letter-spacing:0;margin-bottom:4px}
+#psr i.on{background:#9aa0ad;box-shadow:none}
+body.pong #zona{grid-column:1/3}
+.sets{display:flex;gap:6px;justify-content:center;margin-top:4px}
+.sets i{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.12)}
+.sets i.on{background:var(--col,#ffb042);box-shadow:0 0 10px var(--col,#ffb042)}
+.ladotxt{margin-top:auto;font-size:15px;font-weight:600;letter-spacing:.08em;color:var(--txt2)}
+#pmsg{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  background:rgba(8,9,12,.86);pointer-events:none;text-align:center;padding:0 24px;z-index:2}
+#pmsg.on{display:flex}
+#pmsg b{font-size:clamp(34px,10vw,64px);font-weight:600;line-height:1.05}
+#pmsg span{font-size:17px;color:var(--txt2);line-height:1.45}
 @media (orientation:landscape) and (max-height:560px){
   body{display:grid;grid-template-columns:1fr 200px;grid-template-rows:auto 1fr;column-gap:12px;padding:8px 12px}
   header{display:none}
@@ -113,6 +135,15 @@ body.juego .acciones{grid-template-columns:1fr}
       <div class="tiempo"><span id="tiempo">60</span><small>SEGUNDOS</small></div></div>
     <button id="empezar"><span>Toca para empezar</span><small>Inclina el móvil para mover tu bola de luz<br>y atrapa las estrellas</small></button>
     <div id="final"><b id="fintit">¡Fin de la ronda!</b><span id="fintxt"></span></div>
+    <div class="phud">
+      <div class="marc">
+        <div class="lado"><div class="g" id="pyo">0</div><div class="et">TÚ</div><div class="sets" id="psy"><i></i><i></i></div></div>
+        <div class="vs"><b id="ptiempo">2:00</b>SETS<br>AL MEJOR DE 3</div>
+        <div class="lado"><div class="g" id="priv" style="color:var(--txt2)">0</div><div class="et">RIVAL</div><div class="sets" id="psr"><i></i><i></i></div></div>
+      </div>
+      <div class="ladotxt" id="plado">MUEVE EL DEDO ARRIBA Y ABAJO</div>
+    </div>
+    <div id="pmsg"><b id="pmtit">Esperando…</b><span id="pmtxt"></span></div>
   </div>
 </div>
 <div class="girar" id="girar">↻ Gira el móvil para jugar en grande</div>
@@ -222,6 +253,7 @@ body.juego .acciones{grid-template-columns:1fr}
     if (d.ef) $("ef").textContent = d.ef;
     if (d.ar) { ar = d.ar; ajustar(); }
     if (d.pts !== undefined) marcador(d);
+    if (d.pg) estadoPong(d.pg);
   });
   $("avbtn").onclick = () => location.reload();
   setInterval(() => { if (unido) enviar({ k: "h" }); }, 5000);   // sigo aquí
@@ -233,7 +265,7 @@ body.juego .acciones{grid-template-columns:1fr}
     const z = $("zona").getBoundingClientRect();
     let w = z.width, h = w / ar;
     if (h > z.height) { h = z.height; w = h * ar; }
-    if (modo === "canicas") { w = z.width; h = z.height; }       // en el juego, toda la pantalla
+    if (modo === "canicas" || modo === "pong") { w = z.width; h = z.height; }       // en el juego, toda la pantalla
     pad.style.width = w + "px"; pad.style.height = h + "px";
     dpr = Math.min(2, window.devicePixelRatio || 1);
     cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
@@ -251,6 +283,7 @@ body.juego .acciones{grid-template-columns:1fr}
   };
   const salida = (p) => ({ x: +p.x.toFixed(4), y: +(1 - p.y).toFixed(4) });   // en la fachada, y hacia arriba
   pad.addEventListener("pointerdown", (e) => {
+    if (modo === "pong") { pad.setPointerCapture(e.pointerId); palaDedo(e); e.preventDefault(); return; }
     if (modo === "canicas") { if (!giroOK) { joy = norm(e); pad.setPointerCapture(e.pointerId); } return; }
     if (dedo !== null) return;
     dedo = e.pointerId; pad.setPointerCapture(e.pointerId);
@@ -260,6 +293,7 @@ body.juego .acciones{grid-template-columns:1fr}
     e.preventDefault();
   });
   pad.addEventListener("pointermove", (e) => {
+    if (modo === "pong") { if (e.buttons || e.pointerType === "touch") palaDedo(e); e.preventDefault(); return; }
     if (modo === "canicas") { if (joy) joy = norm(e); return; }
     if (e.pointerId !== dedo) return;
     const p = norm(e); trazos.push({ ...p, v: 1 });
@@ -290,6 +324,7 @@ body.juego .acciones{grid-template-columns:1fr}
     const w = cv.width, h = cv.height;
     ctx.clearRect(0, 0, w, h);
     if (modo === "canicas") { dibujarNivel(t, w, h); requestAnimationFrame(dibujar); return; }
+    if (modo === "pong") { dibujarPong(t, w, h); requestAnimationFrame(dibujar); return; }
     ctx.strokeStyle = "rgba(255,255,255,0.04)"; ctx.lineWidth = 1;
     for (let i = 1; i < 8; i++) { const x = (w * i) / 8; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
     for (let i = 1; i < 4; i++) { const y = (h * i) / 4; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
@@ -353,6 +388,8 @@ body.juego .acciones{grid-template-columns:1fr}
     if (m === modo) return;
     modo = m;
     document.body.classList.toggle("juego", m === "canicas");
+    document.body.classList.toggle("pong", m === "pong");
+    if (m !== "pong") $("pmsg").classList.remove("on");
     setTimeout(ajustar, 0);
     document.body.classList.toggle("parado", m === "canicas" && !empezado);
     $("final").classList.remove("on");
@@ -449,6 +486,69 @@ body.juego .acciones{grid-template-columns:1fr}
     ctx.fillStyle = "rgba(255,255,255,0.45)"; ctx.font = `500 ${Math.round(14 * dpr)}px Inter, system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.fillText(fuerza > 0.08 ? (fuerza > 0.85 ? "¡A TOPE!" : "") : "QUIETA · INCLINA EL MÓVIL", cx, h - 16 * dpr);
+  }
+  // =========================================================== JUEGO: PONG
+  let palaY = 0.5, tPala = 0, palaPend = null, pgEst = {}, ladoPong = null;
+  function palaDedo(e) {
+    const r = cv.getBoundingClientRect();
+    palaY = Math.min(1, Math.max(0, 1 - (e.clientY - r.top) / r.height));
+    const t = performance.now();
+    if (t - tPala > 40) { enviar({ k: "p", y: +palaY.toFixed(3) }); tPala = t; palaPend = null; }
+    else palaPend = palaY;
+  }
+  setInterval(() => {
+    if (modo === "pong" && palaPend !== null) { enviar({ k: "p", y: +palaPend.toFixed(3) }); palaPend = null; tPala = performance.now(); }
+  }, 45);
+  function puntos(el, n) { [...el.children].forEach((c, i) => c.classList.toggle("on", i < n)); }
+  function msg(tit, txt) {
+    if (!tit) { $("pmsg").classList.remove("on"); return; }
+    $("pmtit").textContent = tit; $("pmtxt").textContent = txt || ""; $("pmsg").classList.add("on");
+  }
+  let tFinPong = 0;
+  function estadoPong(d) {
+    const antes = pgEst; pgEst = d;
+    ladoPong = d.lado || null;
+    const t = d.t | 0;
+    $("ptiempo").textContent = `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
+    if (d.lado) {
+      $("pyo").textContent = d.yo; $("priv").textContent = d.rival;
+      puntos($("psy"), d.sy); puntos($("psr"), d.sr);
+      $("psy").style.setProperty("--col", PALETA[colorIdx] || "#ffb042");
+      $("plado").textContent = (d.lado === "izq" ? "◀ JUEGAS A LA IZQUIERDA" : "JUEGAS A LA DERECHA ▶") +
+        (d.oro ? " · ¡PUNTO DE ORO!" : d.niv ? ` · NIVEL ${d.niv + 1}` : "");
+    }
+    if (!d.lado) {
+      msg(d.cola ? (d.cola === 1 ? "Eres el siguiente" : `En cola: ${d.cola}º`) : "Preparando…",
+          "Juega el ganador contra el siguiente de la cola. Mira la fachada mientras esperas.");
+    } else if (d.est === "espera" || !d.rival_ok) {
+      msg("Esperando rival…", "En cuanto otra persona escanee el QR, empieza la partida.");
+    } else if (d.est === "cuenta") {
+      msg(String(d.cuenta || 1), d.lado === "izq" ? "Tu pala es la de la IZQUIERDA" : "Tu pala es la de la DERECHA");
+      if (antes.est !== "cuenta" && navigator.vibrate) navigator.vibrate(60);
+    } else if (d.est === "fin") {
+      msg(d.gana ? "¡Has ganado!" : "Has perdido", d.gana ? "Te quedas en la pista: juegas contra el siguiente." :
+          "Vuelves a la cola. ¡A por la revancha!");
+      if (antes.est !== "fin" && navigator.vibrate) navigator.vibrate(d.gana ? [80, 60, 80, 60, 200] : 200);
+    } else {
+      msg(null);
+      if (antes.yo !== undefined && d.yo > antes.yo && navigator.vibrate) navigator.vibrate(50);
+    }
+  }
+  function dibujarPong(t, w, h) {
+    // carril vertical con tu pala: el dedo arriba = pala arriba en la fachada
+    const col = colorCss(t);
+    const x = ladoPong === "der" ? w * 0.78 : w * 0.22;
+    const top = h * 0.30, bot = h * 0.88, L = bot - top;
+    ctx.strokeStyle = "rgba(255,255,255,0.08)"; ctx.lineWidth = 10 * dpr; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bot); ctx.stroke();
+    const py = bot - palaY * L, ph = L * 0.12;
+    ctx.shadowColor = col; ctx.shadowBlur = 30 * dpr; ctx.strokeStyle = col; ctx.lineWidth = 22 * dpr;
+    ctx.beginPath(); ctx.moveTo(x, py - ph); ctx.lineTo(x, py + ph); ctx.stroke(); ctx.shadowBlur = 0;
+    // flechas de ayuda
+    chevron(w / 2, top + L * 0.18, -Math.PI / 2, Math.min(w, h) * 0.09, "rgba(255,255,255,0.18)", 1, 0);
+    chevron(w / 2, bot - L * 0.18, Math.PI / 2, Math.min(w, h) * 0.09, "rgba(255,255,255,0.18)", 1, 0);
+    ctx.setLineDash([10 * dpr, 14 * dpr]); ctx.strokeStyle = "rgba(255,255,255,0.07)"; ctx.lineWidth = 3 * dpr;
+    ctx.beginPath(); ctx.moveTo(w / 2, top); ctx.lineTo(w / 2, bot); ctx.stroke(); ctx.setLineDash([]);
   }
   function chevron(x, y, ang, s, color, alfa, brillo) {
     ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
