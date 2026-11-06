@@ -135,6 +135,45 @@ body.pong #zona{grid-column:1/3}
 #pmsg.on{display:flex}
 #pmsg b{font-size:clamp(34px,10vw,64px);font-weight:600;line-height:1.05}
 #pmsg span{font-size:17px;color:var(--txt2);line-height:1.45}
+/* carreras */
+#carr{display:none;position:absolute;inset:0;flex-direction:column;gap:12px}
+body.carr #carr{display:flex}
+body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
+.chud{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:none}
+.chud .c{padding:10px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.chud .c small{display:block;font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--txt2)}
+.chud .c b{font-size:46px;font-weight:600;line-height:1.05}
+.chud .c b em{font-style:normal;font-size:22px;color:var(--txt2);font-weight:500}
+.vel{height:14px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;flex:none;position:relative}
+.vel i{position:absolute;inset:0 auto 0 0;width:0;background:var(--col,#ffb042);transition:width .15s linear;border-radius:999px}
+.vel.der i{background:linear-gradient(90deg,var(--col,#ffb042),#ff3d33)}
+.derr{height:22px;text-align:center;font-size:15px;font-weight:600;letter-spacing:.1em;color:var(--err);opacity:0;transition:opacity .15s;flex:none}
+.derr.on{opacity:1}
+#gas{flex:1;min-height:150px;border-radius:28px;border:0;color:#14100a;font:700 clamp(30px,9vw,54px)/1 Inter,system-ui,sans-serif;
+  letter-spacing:.06em;background:radial-gradient(120% 90% at 50% 20%,color-mix(in srgb,var(--col,#ffb042) 100%,#fff 25%),var(--col,#ffb042) 60%,color-mix(in srgb,var(--col,#ffb042) 70%,#000));
+  box-shadow:0 12px 0 color-mix(in srgb,var(--col,#ffb042) 55%,#000),0 20px 50px rgba(0,0,0,.5);touch-action:none;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:transform .06s,box-shadow .06s}
+#gas small{font-size:14px;font-weight:600;letter-spacing:.1em;opacity:.7}
+#gas.on{transform:translateY(10px);box-shadow:0 2px 0 color-mix(in srgb,var(--col,#ffb042) 55%,#000),0 0 60px var(--col,#ffb042)}
+#gas.on small{opacity:.9}
+#cmsg{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  background:rgba(8,9,12,.86);pointer-events:none;text-align:center;padding:0 24px;z-index:2;border-radius:18px}
+#cmsg.on{display:flex}
+#cmsg.trans{background:rgba(8,9,12,.8)}
+#carr.msg #gas span,#carr.msg #gas small{visibility:hidden}
+#cmsg b{font-size:clamp(38px,12vw,76px);font-weight:600;line-height:1.05}
+#cmsg span{font-size:17px;color:var(--txt2);line-height:1.45}
+.sem{display:flex;gap:10px}.sem i{width:34px;height:34px;border-radius:50%;background:#2a0d0b}
+.sem i.on{background:#ff2a1a;box-shadow:0 0 18px #ff2a1a}.sem.verde i{background:#3dff6a;box-shadow:0 0 18px #3dff6a}
+@media (orientation:landscape) and (max-height:560px){
+  body.carr #carr{display:grid;grid-template-columns:1fr 1.3fr;grid-template-rows:auto auto auto 1fr;column-gap:14px}
+  body.carr #carr > .chud,body.carr #carr > .vel,body.carr #carr > .derr{grid-column:1}
+  body.carr #gas{grid-column:2;grid-row:1/5}
+  body.carr .acciones{display:none}
+  body.carr{grid-template-columns:1fr}
+  body.carr .info,body.carr #zona{grid-column:1}
+  .chud .c b{font-size:38px}.chud .c b em{font-size:16px}
+}
 @media (orientation:landscape) and (max-height:560px){
   body{display:grid;grid-template-columns:1fr 200px;grid-template-rows:auto 1fr;column-gap:12px;padding:8px 12px}
   header{display:none}
@@ -170,6 +209,14 @@ body.pong #zona{grid-column:1/3}
     <div class="vidbox" id="vidbox"><video id="vid" playsinline muted preload="auto"></video>
       <div class="vidbar"><button id="vidsnd">Activar sonido</button><button id="vidver">Ocultar vídeo</button></div></div>
     <div class="notas" id="notas"><div class="vacio">Aquí irán apareciendo curiosidades mientras ves la historia.</div></div>
+  </div>
+  <div id="carr">
+    <div class="chud"><div class="c"><small>VUELTA</small><b id="cvu">–<em>/3</em></b></div>
+      <div class="c"><small>POSICIÓN</small><b id="cpo">–</b></div></div>
+    <div class="vel" id="cvel"><i></i></div>
+    <div class="derr" id="cder">¡DERRAPANDO! SUELTA UN POCO</div>
+    <button id="gas"><span>ACELERAR</span><small>MANTÉN PULSADO</small></button>
+    <div id="cmsg" class="on"><b id="cmtit">Esperando…</b><span id="cmtxt"></span></div>
   </div>
   <div id="pad">
     <canvas id="cv"></canvas>
@@ -243,7 +290,7 @@ body.pong #zona{grid-column:1/3}
   function ponerColor(i) {
     colorIdx = i;
     const c = PALETA[i] || "#ffb042";
-    $("yo").style.setProperty("--col", c);
+    $("yo").style.setProperty("--col", c); document.documentElement.style.setProperty("--col", c);
     if (!PALETA[i]) $("yo").style.background = "linear-gradient(90deg,#ff3d33,#ffd23d,#5cff75,#33e6ff,#9e5cff,#ff3da8)";
   }
   ponerColor(0);
@@ -298,6 +345,8 @@ body.pong #zona{grid-column:1/3}
     if (d.ar) { ar = d.ar; ajustar(); }
     if (d.pts !== undefined) marcador(d);
     if (d.pg) estadoPong(d.pg);
+    if (d.cr) estadoCarr(d.cr);
+    if (d.cr_evt === "fuera") { if (navigator.vibrate) navigator.vibrate([90, 60, 220]); cMsg("¡FUERA!", "Ibas muy rápido en la curva. Vuelves a la pista en un momento…", true, 2200); }
   });
   $("avbtn").onclick = () => location.reload();
   setInterval(() => { if (unido) enviar({ k: "h" }); }, 5000);   // sigo aquí
@@ -426,6 +475,72 @@ body.pong #zona{grid-column:1/3}
   if (typeof DeviceMotionEvent === "undefined") $("agitar").style.display = "none";
   document.addEventListener("gesturestart", (e) => e.preventDefault());
 
+  // =========================================================== JUEGO: CARRERAS (mantener para acelerar)
+  let gasOn = false, gasDedo = null, tGas = 0, cEst = "", cMsgHasta = 0, cDerAntes = 0;
+  const gasBtn = $("gas");
+  function enviarGas() { enviar({ k: "a", on: gasOn ? 1 : 0 }); tGas = performance.now(); }
+  function pisarGas(e) {
+    if (gasDedo !== null) return;
+    gasDedo = e.pointerId; try { gasBtn.setPointerCapture(e.pointerId); } catch (x) {}
+    gasOn = true; gasBtn.classList.add("on"); enviarGas();
+    if (navigator.vibrate) navigator.vibrate(15);
+    e.preventDefault();
+  }
+  function soltarGas(e) {
+    if (e && e.pointerId !== gasDedo) return;
+    gasDedo = null;
+    if (!gasOn) return;
+    gasOn = false; gasBtn.classList.remove("on"); enviarGas();
+    setTimeout(() => { if (!gasOn) enviarGas(); }, 120);        // por si se pierde el primero
+  }
+  gasBtn.addEventListener("pointerdown", pisarGas);
+  gasBtn.addEventListener("pointerup", soltarGas);
+  gasBtn.addEventListener("pointercancel", soltarGas);
+  gasBtn.addEventListener("lostpointercapture", soltarGas);
+  gasBtn.addEventListener("contextmenu", (e) => e.preventDefault());
+  document.addEventListener("visibilitychange", () => { if (document.hidden) { gasDedo = null; gasOn = false; gasBtn.classList.remove("on"); enviarGas(); } });
+  setInterval(() => { if (modo === "carreras" && gasOn && performance.now() - tGas > 300) enviarGas(); }, 100);
+  function cMsg(tit, txt, trans, ms) {
+    $("cmtit").innerHTML = tit; $("cmtxt").textContent = txt || "";
+    $("cmsg").classList.toggle("trans", !!trans);
+    $("cmsg").classList.add("on"); $("carr").classList.add("msg");
+    cMsgHasta = ms ? Date.now() + ms : 0;
+  }
+  function cSinMsg() { if (Date.now() > cMsgHasta) { $("cmsg").classList.remove("on"); $("carr").classList.remove("msg"); } }
+  function estadoCarr(d) {
+    const tot = d.total || 3;
+    if (d.carril === undefined) {                       // no estoy en la pista
+      $("cvu").innerHTML = `–<em>/${tot}</em>`; $("cpo").textContent = "–";
+      $("cvel").firstElementChild.style.width = "0";
+      if (d.cola) cMsg(d.cola === 1 ? "¡Eres el siguiente!" : `Turno ${d.cola}º`, `Hay ${d.n} coches corriendo. Mira la carrera en la fachada: entras en la próxima.`);
+      else cMsg("Esperando…", "Enseguida empieza la carrera.");
+      cEst = d.est; return;
+    }
+    $("cvu").innerHTML = `${d.vuelta}<em>/${tot}</em>`;
+    $("cpo").innerHTML = `${d.pos}º<em> de ${d.n}</em>`;
+    const v = $("cvel"); v.firstElementChild.style.width = Math.round(d.vel * 100) + "%";
+    v.classList.toggle("der", d.der > 0.05);
+    $("cder").classList.toggle("on", d.der > 0.15 && d.est === "carrera" && !d.fuera);
+    if (d.der > 0.5 && cDerAntes <= 0.5 && navigator.vibrate) navigator.vibrate(60);
+    cDerAntes = d.der;
+    if (d.est === "espera") {
+      cMsg(d.faltan ? `Salida en ${d.faltan}` : "Esperando rivales…", `Estás en el carril ${d.carril}. Pon el dedo en ACELERAR cuando se ponga verde.`, true);
+    } else if (d.est === "salida") {
+      const enc = 5 - d.cuenta;
+      cMsg(`<div class="sem${d.cuenta === 0 ? " verde" : ""}">` + [0,1,2,3,4].map(i => `<i class="${i < enc ? "on" : ""}"></i>`).join("") + "</div>",
+           d.cuenta ? "¡Preparado! Espera al verde…" : "¡YA!", true);
+      if (d.cuenta !== cEst && navigator.vibrate) navigator.vibrate(30);
+      cEst = d.cuenta;
+      return;
+    } else if (d.est === "carrera") {
+      cSinMsg();
+    } else if (d.est === "fin") {
+      if (d.gana) { cMsg("¡HAS GANADO! 🏆", "Eres el más rápido de la fachada.", false); if (cEst !== "fin" && navigator.vibrate) navigator.vibrate([80, 60, 80, 60, 300]); }
+      else cMsg(`${d.pos}º puesto`, "Buena carrera. Si no hay nadie esperando, vuelves a correr enseguida.", false);
+    }
+    cEst = d.est;
+  }
+
   // =========================================================== JUEGO: CANICAS (giroscopio)
   let ori = null, base = null, tilt = { x: 0, y: 0 }, tFinal = 0;
   function ponerModo(m) {
@@ -434,6 +549,8 @@ body.pong #zona{grid-column:1/3}
     document.body.classList.toggle("juego", m === "canicas");
     document.body.classList.toggle("pong", m === "pong");
     document.body.classList.toggle("capi", m === "capitulos");
+    document.body.classList.toggle("carr", m === "carreras");
+    if (m !== "carreras") soltarGas();
     if (m !== "capitulos") { try { $("vid").pause(); } catch (e) {} }
     if (m !== "pong") $("pmsg").classList.remove("on");
     setTimeout(ajustar, 0);
