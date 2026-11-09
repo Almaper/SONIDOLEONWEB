@@ -301,11 +301,25 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     clientId: "lm_" + PID + "_" + Math.random().toString(36).slice(2, 6),
     clean: true, keepalive: 30, reconnectPeriod: 2000, connectTimeout: 8000
   });
+  // Los servidores MQTT públicos admiten ~10 mensajes/s por móvil: los movimientos (dibujo y pala) se
+  // apuntan con su hora exacta y se mandan en paquetes cada 120 ms; el SHOW los reproduce al mismo ritmo.
+  const lote = { m: [], p: [] };
+  function vaciarLote() {
+    if (!cli.connected) { lote.m = []; lote.p = []; return; }
+    for (const k of ["m", "p"]) if (lote[k].length) { publicar({ k, s: lote[k] }); lote[k] = []; }
+  }
+  setInterval(vaciarLote, 120);
+  function publicar(o) {
+    o.p = PID;
+    cli.publish(BASE + "in", JSON.stringify(o), { qos: 0 });
+  }
   function enviar(o) {
     if (!cli.connected) return;
-    o.p = PID;
-    if (o.k === "m" || o.k === "d" || o.k === "u" || o.k === "p") o.ts = Math.round(performance.now());   // para que el SHOW lo reproduzca suave
-    cli.publish(BASE + "in", JSON.stringify(o), { qos: 0 });
+    const ts = Math.round(performance.now());
+    if (o.k === "m") { lote.m.push([ts, o.x, o.y]); if (lote.m.length > 12) vaciarLote(); return; }
+    if (o.k === "p") { lote.p.push([ts, o.y]); if (lote.p.length > 12) vaciarLote(); return; }
+    if (o.k === "d" || o.k === "u") { vaciarLote(); o.ts = ts; }
+    publicar(o);
   }
   cli.on("connect", () => {
     pill("wait", "BUSCANDO");
@@ -588,7 +602,7 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     if (modo !== "canicas" || !empezado || !unido) return;
     calcTilt();
     enviar({ k: "t", x: +tilt.x.toFixed(3), y: +tilt.y.toFixed(3) });
-  }, 50);
+  }, 125);
   $("empezar").onclick = async () => {
     try {
       if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
