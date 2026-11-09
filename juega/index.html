@@ -262,6 +262,7 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
   const q = new URLSearchParams(location.search);
   const S = q.get("s") || "", C = (q.get("c") || "").toUpperCase();
   const BROKER = q.get("b") || "wss://broker.emqx.io:8084/mqtt";
+  const PUBLICO = BROKER.indexOf("broker.emqx.io") >= 0;   // servidor público: máx. ~10 mensajes/s por móvil
   const $ = (id) => document.getElementById(id);
   const aviso = (tit, txt, reintentar) => {
     $("avtit").textContent = tit; $("avtxt").textContent = txt;
@@ -299,7 +300,8 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
   // ---------- conexión
   const cli = mqtt.connect(BROKER, {
     clientId: "lm_" + PID + "_" + Math.random().toString(36).slice(2, 6),
-    clean: true, keepalive: 30, reconnectPeriod: 2000, connectTimeout: 8000
+    clean: true, keepalive: 30, reconnectPeriod: 2000, connectTimeout: 8000,
+    ...(q.get("u") ? { username: q.get("u"), password: q.get("k") || "" } : {})
   });
   // Los servidores MQTT públicos admiten ~10 mensajes/s por móvil: los movimientos (dibujo y pala) se
   // apuntan con su hora exacta y se mandan en paquetes cada 120 ms; el SHOW los reproduce al mismo ritmo.
@@ -308,7 +310,7 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     if (!cli.connected) { lote.m = []; lote.p = []; return; }
     for (const k of ["m", "p"]) if (lote[k].length) { publicar({ k, s: lote[k] }); lote[k] = []; }
   }
-  setInterval(vaciarLote, 120);
+  setInterval(vaciarLote, PUBLICO ? 120 : 33);   // servidor propio: casi sin espera
   function publicar(o) {
     o.p = PID;
     cli.publish(BASE + "in", JSON.stringify(o), { qos: 0 });
