@@ -304,6 +304,7 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
   function enviar(o) {
     if (!cli.connected) return;
     o.p = PID;
+    if (o.k === "m" || o.k === "d" || o.k === "u" || o.k === "p") o.ts = Math.round(performance.now());   // para que el SHOW lo reproduzca suave
     cli.publish(BASE + "in", JSON.stringify(o), { qos: 0 });
   }
   cli.on("connect", () => {
