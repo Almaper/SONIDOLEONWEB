@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#111114">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Mando · Lumentia Presenter · Sonido León</title>
+<link rel="icon" href="lumentia.png">
+<link rel="apple-touch-icon" href="lumentia.png">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#0b0b0d;color:#f2f2f2;font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;overscroll-behavior:none}
+body{display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;border:0;border-radius:12px;background:#24242a;cursor:pointer;touch-action:manipulation}
+button:active{filter:brightness(1.35);transform:scale(.98)}
+button:disabled{opacity:.35}
+.top{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#111114;border-bottom:1px solid #26262b}
+.dot{width:10px;height:10px;border-radius:50%;background:#e5484d;flex:none}
+.dot.on{background:#2fb55a;box-shadow:0 0 6px #2fb55a}
+.cue{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slide{color:#ff9f1a;font-weight:700;white-space:nowrap}
+.times{display:flex;align-items:baseline;gap:12px;padding:8px 14px 0;font-family:Consolas,Menlo,monospace}
+.timer{font-size:30px;font-weight:700}
+.timer.paused{color:#888}
+.remain{font-size:18px;color:#aaa}
+.remain.warn{color:#f5b301}.remain.over{color:#ff4d4f}
+.clock{margin-left:auto;font-size:16px;color:#aaa}
+.scroll{flex:1;min-height:0;overflow:auto;padding:10px 14px;display:flex;flex-direction:column;gap:10px}
+.lbl{font-size:11px;font-weight:700;letter-spacing:1px;color:#8a8a93;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.lbl span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0;font-weight:400;color:#bbb}
+.imgs{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
+.frame{aspect-ratio:16/9;background:#000 center/contain no-repeat;border:1px solid #26262b;border-radius:8px}
+.notesbar{display:flex;align-items:center}
+.notesbar button{padding:4px 12px;margin-left:6px;font-size:13px}
+.notes{background:#141418;border:1px solid #26262b;border-radius:8px;padding:12px 14px;white-space:pre-wrap;line-height:1.45;font-size:20px;user-select:text;-webkit-user-select:text;min-height:80px}
+.notes.empty{color:#666}
+.pad{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;padding:10px 14px}
+.pad .prev{font-size:20px;font-weight:700;min-height:86px}
+.pad .next{font-size:24px;font-weight:800;min-height:86px;background:#ff9f1a;color:#000}
+.row2{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px;padding:0 14px 12px}
+.row2 button{min-height:52px;font-weight:700}
+.go{background:#2fb55a;color:#000}
+.black.on{background:#e5484d;color:#fff}
+.ovl.on{background:#ff9f1a;color:#000}
+.off{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;font-size:17px;z-index:5}
+.off[hidden]{display:none}
+@media (orientation:landscape) and (max-height:520px){
+  .imgs{grid-template-columns:1fr 1fr}
+  .notes{font-size:17px}
+}
+</style>
+</head>
+<body>
+<div class="top"><span id="dot" class="dot"></span><span id="cue" class="cue">Conectando…</span><span id="slide" class="slide"></span></div>
+<div class="times"><span id="timer" class="timer paused">00:00</span><span id="remain" class="remain"></span><span id="clock" class="clock"></span></div>
+<div class="scroll">
+  <div class="imgs">
+    <div><div class="lbl">EN PANTALLA</div><div id="now" class="frame"></div></div>
+    <div><div class="lbl">SIGUIENTE <span id="nextLbl"></span></div><div id="next" class="frame"></div></div>
+  </div>
+  <div>
+    <div class="lbl notesbar">NOTAS <span></span><button id="smaller" aria-label="Letra más pequeña">A−</button><button id="bigger" aria-label="Letra más grande">A+</button></div>
+    <div id="notes" class="notes empty">Sin notas.</div>
+  </div>
+</div>
+<div class="pad">
+  <button id="bPrev" class="prev">◀ Anterior</button>
+  <button id="bNext" class="next">Siguiente ▶</button>
+</div>
+<div class="row2">
+  <button id="bGo" class="go">GO · siguiente cue</button>
+  <button id="bBlack" class="black">Negro</button>
+  <button id="bOvl" class="ovl" title="Mostrar u ocultar el reloj / rótulo en pantalla">Reloj</button>
+  <button id="bStop">Parar</button>
+</div>
+<div id="off" class="off">Conectando con Lumentia Presenter…</div>
+<script src="mqtt.min.js"></script>
+<script src="mando-net.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const pad = n => String(n).padStart(2, '0');
+const fmt = s => { s = Math.floor(Math.abs(s)); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60; return (h ? h + ':' + pad(m) : pad(m)) + ':' + pad(s % 60); };
+// Mando por internet: la app y este móvil se encuentran en un servidor MQTT y todo va cifrado
+// con la clave del enlace (detrás de «#», no sale del móvil). Ver mando-net.js.
+const cfg = MandoNet.parseLink(location.hash);
+let cli = null, net = null, st = null, stAt = 0, size = +(localStorage.getItem('lp-notes') || 20), lastSeen = 0, offline = false;
+let PID = sessionStorage.getItem('lp-mando-id');
+if (!PID) { PID = 'm' + Math.random().toString(36).slice(2, 12); sessionStorage.setItem('lp-mando-id', PID); }
+const off = (txt) => { $('#dot').classList.remove('on'); $('#off').hidden = false; $('#off').textContent = txt; };
+const ok = () => { $('#dot').classList.add('on'); $('#off').hidden = true; };
+
+async function connect() {
+  if (!MandoNet.validKey(cfg.key)) { off('Escanea el código QR de Lumentia Presenter (pestaña «Mando» → «Mando por internet») con la cámara del móvil.'); return; }
+  net = await MandoNet.open(cfg.key);
+  cli = mqtt.connect(cfg.broker, {
+    clientId: 'lp_m_' + PID + '_' + Math.random().toString(36).slice(2, 6), clean: true, keepalive: 30,
+    reconnectPeriod: 2000, connectTimeout: 8000, protocolVersion: 4,
+    ...(cfg.user ? { username: cfg.user, password: cfg.pass } : {})
+  });
+  cli.on('connect', () => {
+    off('Buscando Lumentia Presenter…');
+    cli.subscribe([net.topic('s'), net.topic('n'), net.topic('x')], { qos: 0 });
+    hello();
+    setTimeout(() => { if (!st && !offline && cli.connected) off('No encuentro Lumentia Presenter con este código. Comprueba que el «Mando por internet» está activado en la app o vuelve a escanear el QR (si se creó una clave nueva, el código anterior ya no sirve).'); }, 9000);
+  });
+  cli.on('reconnect', () => off('Reconectando…'));
+  cli.on('offline', () => off('Sin conexión a internet. Reintentando…'));
+  cli.on('error', () => off('No se puede conectar con el servidor. Reintentando…'));
+  cli.on('message', async (topic, payload) => {
+    const m = await net.open(payload.toString());
+    if (!m) return;
+    if (m.t === 'off') { offline = true; off('Lumentia Presenter está cerrado o sin internet. Esperando…'); return; }
+    lastSeen = Date.now(); offline = false;
+    if (m.t === 'state') { st = m; stAt = Date.now(); if (m.at && Date.now() - m.at > 20000) return; ok(); render(); }
+    else if (m.t === 'now') $('#now').style.backgroundImage = m.img ? `url(${m.img})` : '';
+    else if (m.t === 'next') $('#next').style.backgroundImage = m.img ? `url(${m.img})` : '';
+  });
+}
+// «sigo aquí»: la app cuenta los móviles conectados y empieza a mandar imágenes
+function hello() { if (cli && cli.connected && net) net.seal({ t: 'hi', id: PID }).then(p => cli.publish(net.topic('p'), p, { qos: 0 })); }
+setInterval(hello, 10000);
+// si la app deja de dar señales (cerrada o sin internet), se avisa
+setInterval(() => { if (cli && cli.connected && st && !offline && Date.now() - lastSeen > 15000) off('Sin noticias de Lumentia Presenter (¿sigue abierta y con internet?). Esperando…'); }, 3000);
+function render() {
+  if (!st) return;
+  $('#cue').textContent = st.cue;
+  $('#slide').textContent = st.slide ? st.slide.replace('Diapositiva ', '') : '';
+  $('#nextLbl').textContent = st.next || '';
+  const n = $('#notes');
+  n.textContent = st.notes || (st.slide ? 'Sin notas para esta diapositiva.' : 'Sin notas.');
+  n.classList.toggle('empty', !st.notes);
+  n.style.fontSize = size + 'px';
+  $('#bBlack').classList.toggle('on', !!st.black);
+  $('#bOvl').classList.toggle('on', !!st.ovl);
+  $('#bPrev').disabled = !st.canPrev;
+  tick();
+}
+function tick() {
+  $('#clock').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (!st) return;
+  const el = st.elapsed + (st.running ? (Date.now() - stAt) / 1000 : 0);
+  $('#timer').textContent = fmt(el);
+  $('#timer').classList.toggle('paused', !st.running);
+  const r = $('#remain');
+  if (st.target) { const rem = st.target * 60 - el; r.textContent = (rem < 0 ? '+' : '−') + fmt(rem); r.className = 'remain ' + (rem < 0 ? 'over' : rem < 300 ? 'warn' : ''); }
+  else r.textContent = '';
+}
+setInterval(tick, 500);
+
+function send(cmd) {
+  if (!cli || !cli.connected || !net) return;
+  const n = Array.from(crypto.getRandomValues(new Uint8Array(8)), x => x.toString(16).padStart(2, '0')).join('');
+  net.seal({ cmd, ts: Date.now(), n, id: PID }).then(p => cli.publish(net.topic('c'), p, { qos: 0 }));
+  if (navigator.vibrate) navigator.vibrate(15);
+}
+const tap = (id, fn) => $(id).addEventListener('click', fn);
+tap('#bNext', () => send('next'));
+tap('#bPrev', () => send('prev'));
+tap('#bGo', () => send('go'));
+tap('#bBlack', () => send('black'));
+tap('#bOvl', () => send('ovl'));
+tap('#bStop', () => { if (confirm('¿Fundir todo a negro y parar?')) send('stop'); });
+tap('#smaller', () => { size = Math.max(12, size - 2); localStorage.setItem('lp-notes', size); render(); });
+tap('#bigger', () => { size = Math.min(48, size + 2); localStorage.setItem('lp-notes', size); render(); });
+// Teclado (tabletas con teclado o mandos Bluetooth emparejados con el móvil)
+document.addEventListener('keydown', e => {
+  const m = { ArrowRight: 'next', PageDown: 'next', ArrowLeft: 'prev', PageUp: 'prev', Space: 'go', Enter: 'go', KeyB: 'black', Period: 'black' }[e.code];
+  if (m) { e.preventDefault(); send(m); }
+});
+document.addEventListener('dblclick', e => e.preventDefault());
+connect();
+</script>
+<script>
+// Mantener la pantalla del móvil encendida mientras el mando está abierto.
+// En https (sonidoleon.com) usa el «Wake Lock» del navegador; si no se puede (p. ej. el mando
+// por Wi‑Fi, que va por http), reproduce un vídeo diminuto, mudo y en bucle (necesita un toque).
+(function () {
+  const SRC = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAMpbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAlN0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAABAAAAAQAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAfQAAAAAAABAAAAAAHLbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAABAAAAAgABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABdm1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAATZzdGJsAAAAtnN0c2QAAAAAAAAAAQAAAKZhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAABAAEABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAALGF2Y0MBQsAK/+EAFWdCwAraewEQAAADABAAAAMAIPEiagEABGjOD8gAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAAKMAAACjAAAAAYc3R0cwAAAAAAAAABAAAAAgAAQAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAAgAAAAEAAAAcc3RzegAAAAAAAAAAAAAAAgAAAoMAAAAJAAAAFHN0Y28AAAAAAAAAAQAAA1kAAABidWR0YQAAAFptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAAC1pbHN0AAAAJal0b28AAAAdZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAAhmcmVlAAAClG1kYXQAAAJtBgX//2ncRem95tlIt5Ys2CDZI+7veDI2NCAtIGNvcmUgMTY0IHIzMTA4IDMxZTE5ZjkgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDIzIC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MCByZWY9MSBkZWJsb2NrPTE6MDowIGFuYWx5c2U9MHgxOjB4MSBtZT1oZXggc3VibWU9MiBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0wIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MCA4eDhkY3Q9MCBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0wIHRocmVhZHM9MSBsb29rYWhlYWRfdGhyZWFkcz0xIHNsaWNlZF90aHJlYWRzPTAgbnI9MCBkZWNpbWF0ZT0xIGludGVybGFjZWQ9MCBibHVyYXlfY29tcGF0PTAgY29uc3RyYWluZWRfaW50cmE9MCBiZnJhbWVzPTAgd2VpZ2h0cD0wIGtleWludD0yNTAga2V5aW50X21pbj0xIHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9MTAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAADmWIhAW///8PRQABT3+AAAAABUGaIBX1';
+  let lock = null, vid = null;
+  async function wake() {
+    try {
+      if ('wakeLock' in navigator && document.visibilityState === 'visible' && !lock) {
+        lock = await navigator.wakeLock.request('screen');
+        lock.addEventListener('release', () => { lock = null; });
+      }
+      if (lock) return true;
+    } catch (e) { /* no permitido aquí */ }
+    return false;
+  }
+  function video() {
+    if (!vid) {
+      vid = document.createElement('video');
+      vid.setAttribute('playsinline', ''); vid.setAttribute('muted', ''); vid.muted = true; vid.loop = true; vid.src = SRC;
+      vid.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:.01;pointer-events:none';
+      document.body.appendChild(vid);
+    }
+    if (vid.paused) vid.play().catch(() => {});
+  }
+  async function on() { if (!(await wake())) video(); }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') on(); });
+  for (const ev of ['click', 'touchend']) document.addEventListener(ev, on, { passive: true });
+  on();
+})();
+</script>
+</body>
+</html>
