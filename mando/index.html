@@ -46,8 +46,9 @@ button:disabled{opacity:.35}
 .go{background:#2fb55a;color:#000}
 .black.on{background:#e5484d;color:#fff}
 .ovl.on{background:#ff9f1a;color:#000}
-.off{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;font-size:17px;z-index:5}
+.off{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;font-size:17px;z-index:5}
 .off[hidden]{display:none}
+.off .take{display:block;margin:18px auto 0;padding:14px 26px;font-weight:800;font-size:17px;background:#ff9f1a;color:#000}
 @media (orientation:landscape) and (max-height:520px){
   .imgs{grid-template-columns:1fr 1fr}
   .notes{font-size:17px}
@@ -88,7 +89,7 @@ const fmt = s => { s = Math.floor(Math.abs(s)); const h = Math.floor(s / 3600), 
 // Mando por internet: la app y este móvil se encuentran en un servidor MQTT y todo va cifrado
 // con la clave del enlace (detrás de «#», no sale del móvil). Ver mando-net.js.
 const cfg = MandoNet.parseLink(location.hash);
-let cli = null, net = null, st = null, stAt = 0, size = +(localStorage.getItem('lp-notes') || 20), lastSeen = 0, offline = false;
+let wantTake = true, kicked = false, graceUntil = 0, confirmed = false, cli = null, net = null, st = null, stAt = 0, size = +(localStorage.getItem('lp-notes') || 20), lastSeen = 0, offline = false;
 let PID = sessionStorage.getItem('lp-mando-id');
 if (!PID) { PID = 'm' + Math.random().toString(36).slice(2, 12); sessionStorage.setItem('lp-mando-id', PID); }
 const off = (txt) => { $('#dot').classList.remove('on'); $('#off').hidden = false; $('#off').textContent = txt; };
@@ -105,7 +106,7 @@ async function connect() {
   cli.on('connect', () => {
     off('Buscando Lumentia Presenter…');
     cli.subscribe([net.topic('s'), net.topic('n'), net.topic('x')], { qos: 0 });
-    hello();
+    hello(wantTake); wantTake = false;                // al abrir el enlace, este móvil toma el mando
     setTimeout(() => { if (!st && !offline && cli.connected) off('No encuentro Lumentia Presenter con este código. Comprueba que el «Mando por internet» está activado en la app o vuelve a escanear el QR (si se creó una clave nueva, el código anterior ya no sirve).'); }, 9000);
   });
   cli.on('reconnect', () => off('Reconectando…'));
@@ -116,16 +117,37 @@ async function connect() {
     if (!m) return;
     if (m.t === 'off') { offline = true; off('Lumentia Presenter está cerrado o sin internet. Esperando…'); return; }
     lastSeen = Date.now(); offline = false;
-    if (m.t === 'state') { st = m; stAt = Date.now(); if (m.at && Date.now() - m.at > 20000) return; ok(); render(); }
+    if (m.t === 'state') {
+      st = m; stAt = Date.now();
+      if (m.at && Date.now() - m.at > 20000) return;
+      // mientras la app no confirma que este móvil tiene el mando, se ignora el estado viejo guardado en el servidor
+      if (m.owner === PID) { confirmed = true; kicked = false; }
+      else if (confirmed || Date.now() > graceUntil) { if (!kicked) showKicked(m.owner === 'wifi'); confirmed = false; return; }
+      else return;
+      if (kicked) return;
+      ok(); render();
+    }
     else if (m.t === 'now') $('#now').style.backgroundImage = m.img ? `url(${m.img})` : '';
     else if (m.t === 'next') $('#next').style.backgroundImage = m.img ? `url(${m.img})` : '';
   });
 }
 // «sigo aquí»: la app cuenta los móviles conectados y empieza a mandar imágenes
-function hello() { if (cli && cli.connected && net) net.seal({ t: 'hi', id: PID }).then(p => cli.publish(net.topic('p'), p, { qos: 0 })); }
-setInterval(hello, 10000);
+function hello(take = false) {
+  if (!cli || !cli.connected || !net || (kicked && !take)) return;
+  if (take) { graceUntil = Date.now() + 5000; confirmed = false; }
+  net.seal({ t: 'hi', id: PID, take }).then(p => cli.publish(net.topic('p'), p, { qos: 0 }));
+}
+setInterval(() => hello(false), 10000);
+// Solo un ponente tiene el mando: si otro abre el enlace, este se desconecta.
+function showKicked(wifi) {
+  kicked = true;
+  $('#dot').classList.remove('on');
+  const o = $('#off'); o.hidden = false;
+  o.innerHTML = `Otro dispositivo ha tomado el mando${wifi ? ' (por Wi‑Fi)' : ''}.<br><small style="color:#999">Solo un ponente puede manejar la presentación a la vez.</small><button class="take" id="take">Tomar el mando</button>`;
+  $('#take').onclick = () => { kicked = false; o.textContent = 'Conectando…'; hello(true); };
+}
 // si la app deja de dar señales (cerrada o sin internet), se avisa
-setInterval(() => { if (cli && cli.connected && st && !offline && Date.now() - lastSeen > 15000) off('Sin noticias de Lumentia Presenter (¿sigue abierta y con internet?). Esperando…'); }, 3000);
+setInterval(() => { if (!kicked && cli && cli.connected && st && !offline && Date.now() - lastSeen > 15000) off('Sin noticias de Lumentia Presenter (¿sigue abierta y con internet?). Esperando…'); }, 3000);
 function render() {
   if (!st) return;
   $('#cue').textContent = st.cue;
@@ -153,7 +175,7 @@ function tick() {
 setInterval(tick, 500);
 
 function send(cmd) {
-  if (!cli || !cli.connected || !net) return;
+  if (!cli || !cli.connected || !net || kicked) return;
   const n = Array.from(crypto.getRandomValues(new Uint8Array(8)), x => x.toString(16).padStart(2, '0')).join('');
   net.seal({ cmd, ts: Date.now(), n, id: PID }).then(p => cli.publish(net.topic('c'), p, { qos: 0 }));
   if (navigator.vibrate) navigator.vibrate(15);
