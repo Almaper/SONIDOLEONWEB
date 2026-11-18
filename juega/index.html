@@ -139,6 +139,9 @@ body.pong #zona{grid-column:1/3}
 #hook{display:none;position:absolute;inset:0;flex-direction:column;gap:12px}
 body.hook #hook{display:flex}
 body.hook #pad, body.hook .acciones, body.hook .girar{display:none}
+.hkcod{flex:none;text-align:center;padding:8px 12px;border-radius:14px;border:1px dashed var(--col,#ffb042);
+  color:var(--txt2);font-size:15px}
+.hkcod b{font:700 20px/1 ui-monospace,Menlo,monospace;letter-spacing:.1em;color:var(--col,#ffb042);margin-left:4px}
 .hkhud{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:none}
 .hkhud .c{padding:10px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
 .hkhud .c small{display:block;font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--txt2)}
@@ -253,6 +256,7 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
   <div id="hook">
     <div class="hkhud"><div class="c"><small>TIEMPO</small><b id="hkt">–</b></div>
       <div class="c"><small>PREMIOS</small><b id="hkp">0</b></div></div>
+    <div id="hkcod" class="hkcod" hidden>🎁 Tu código: <b></b></div>
     <div class="hkctl">
       <div class="hkcruz">
         <button id="hku" aria-label="Hacia el fondo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15 L12 8 L19 15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -586,6 +590,9 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
       else hkMsg("Esperando…", "Enseguida te toca.");
       hkEst = ""; return;
     }
+    if (d.est === "mover" && hkPremio) {             // vuelve a tocarle: se quita el aviso, el código sigue arriba
+      hkPremio = false; $("hkmsg").classList.remove("on", "premio");
+    }
     if (d.est !== hkEst && d.est === "mover") { if (navigator.vibrate) navigator.vibrate([40, 40, 40]); hkMsg("¡TE TOCA!", "Muévelo con la cruceta (arriba = hacia el fondo) y pulsa AGARRAR encima de una bola con el logo.", 2000); }
     hkEst = d.est;
     $("hkt").textContent = d.est === "mover" ? d.t : "·";
@@ -599,8 +606,10 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     const e = d.hk_evt;
     if (e === "premio") {
       hkPremio = false;
-      hkMsg("¡PREMIO! 🎁", `<span style="display:block;margin-bottom:12px">Enseña este código para recoger tu regalo:</span><span class="codigo">${d.codigo}</span>`, 0, true);
+      hkMsg("¡PREMIO! 🎁", `<span style="display:block;margin-bottom:12px">Enseña este código para recoger tu regalo:</span><span class="codigo">${d.codigo}</span><span style="display:block;margin-top:14px;font-size:14px">Toca para seguir jugando · el código queda guardado arriba</span>`, 0, true);
       hkPremio = true;
+      const cod = $("hkcod"); cod.hidden = false;
+      cod.querySelector("b").textContent = (cod.querySelector("b").textContent ? cod.querySelector("b").textContent + " · " : "") + d.codigo;
       if (navigator.vibrate) navigator.vibrate([100, 60, 100, 60, 400]);
     } else if (e === "escurre") { hkMsg("¡Oh! Se ha escurrido", "Casi… vuelves a la cola para otro intento.", 2500); if (navigator.vibrate) navigator.vibrate(200); }
     else if (e === "nada") hkMsg("No has cogido nada", "Prueba a bajar justo encima de una bola. Vuelves a la cola.", 2500);
