@@ -144,11 +144,15 @@ body.hook #pad, body.hook .acciones, body.hook .girar{display:none}
 .hkhud .c small{display:block;font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--txt2)}
 .hkhud .c b{font-size:46px;font-weight:600;line-height:1.05}
 .hkctl{flex:1;display:flex;flex-direction:column;gap:18px;min-height:160px;align-items:stretch}
-.hkflechas{flex:none;height:118px;display:flex;gap:10px}
-.hkflechas button{flex:1;border-radius:24px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--txt);
+.hkcruz{flex:none;align-self:center;width:min(100%,250px);aspect-ratio:1;display:grid;grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);gap:6px}
+.hkcruz button{border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--txt);
   display:flex;align-items:center;justify-content:center;touch-action:none;transition:transform .06s,background .06s}
-.hkflechas button svg{width:56%;max-width:84px;height:auto}
-.hkflechas button.on{background:color-mix(in srgb,var(--col,#ffb042) 35%,transparent);transform:scale(.96);border-color:var(--col,#ffb042)}
+.hkcruz button svg{width:62%;height:auto}
+#hku{grid-area:1/2}#hkl{grid-area:2/1}#hkr{grid-area:2/3}#hkd{grid-area:3/2}
+.hkcruz button.on{background:color-mix(in srgb,var(--col,#ffb042) 40%,transparent);transform:scale(.94);border-color:var(--col,#ffb042)}
+#hkmsg .hkcola{font:700 clamp(70px,24vw,130px)/1 Inter,system-ui,sans-serif;color:var(--col,#ffb042)}
+#hkmsg .hkcola small{font-size:.32em;font-weight:600;color:var(--txt2);margin-left:4px}
 #hkgo{flex:none;width:min(100%,260px);aspect-ratio:1;border-radius:50%;align-self:center;margin:auto 0;border:0;color:#14100a;
   font:700 clamp(20px,6vw,34px)/1.05 Inter,system-ui,sans-serif;letter-spacing:.05em;touch-action:none;
   background:radial-gradient(120% 90% at 50% 20%,color-mix(in srgb,var(--col,#ffb042) 100%,#fff 25%),var(--col,#ffb042) 60%,color-mix(in srgb,var(--col,#ffb042) 70%,#000));
@@ -156,7 +160,7 @@ body.hook #pad, body.hook .acciones, body.hook .girar{display:none}
 #hkgo.on{transform:translateY(8px);box-shadow:0 2px 0 color-mix(in srgb,var(--col,#ffb042) 55%,#000),0 0 60px var(--col,#ffb042)}
 #hkgo:disabled{opacity:.35;filter:grayscale(.6)}
 #hkmsg{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;
-  background:rgba(8,9,12,.86);text-align:center;padding:0 24px;z-index:2;border-radius:18px;pointer-events:none}
+  background:rgba(8,9,12,.94);text-align:center;padding:0 24px;z-index:2;border-radius:18px;pointer-events:none}
 #hkmsg.on{display:flex}
 #hkmsg b{font-size:clamp(34px,11vw,70px);font-weight:600;line-height:1.05}
 #hkmsg span{font-size:17px;color:var(--txt2);line-height:1.45}
@@ -167,9 +171,9 @@ body.hook #pad, body.hook .acciones, body.hook .girar{display:none}
   body.hook{grid-template-columns:1fr}
   body.hook .info,body.hook #zona{grid-column:1}
   .hkhud .c b{font-size:34px}
-  .hkctl{flex-direction:row}
-  .hkflechas{flex:1;height:auto}
-  #hkgo{width:auto;height:100%;max-height:220px;margin:0}
+  .hkctl{flex-direction:row;justify-content:space-around}
+  .hkcruz{width:auto;height:100%;max-height:230px}
+  #hkgo{width:auto;height:100%;max-height:200px;margin:0}
 }
 /* carreras */
 #carr{display:none;position:absolute;inset:0;flex-direction:column;gap:12px}
@@ -250,8 +254,12 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     <div class="hkhud"><div class="c"><small>TIEMPO</small><b id="hkt">–</b></div>
       <div class="c"><small>PREMIOS</small><b id="hkp">0</b></div></div>
     <div class="hkctl">
-      <div class="hkflechas"><button id="hkl" aria-label="Mover a la izquierda"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <button id="hkr" aria-label="Mover a la derecha"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5 L16 12 L9 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="hkcruz">
+        <button id="hku" aria-label="Hacia el fondo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15 L12 8 L19 15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="hkl" aria-label="A la izquierda"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="hkr" aria-label="A la derecha"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5 L16 12 L9 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="hkd" aria-label="Hacia delante"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9 L12 16 L19 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
       <button id="hkgo">¡AGARRAR!</button>
     </div>
     <div id="hkmsg" class="on"><b id="hkmt">Esperando…</b><span id="hkmx"></span></div>
@@ -541,19 +549,21 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
   document.addEventListener("gesturestart", (e) => e.preventDefault());
 
   // =========================================================== JUEGO: HOOK (gancho)
-  let hkDx = 0, hkT = 0, hkEst = "", hkMsgHasta = 0, hkPremio = false;
-  function hkEnviar() { enviar({ k: "g", dx: hkDx }); hkT = performance.now(); }
-  function hkFlecha(id, dx) {
+  let hkDx = 0, hkDz = 0, hkT = 0, hkEst = "", hkMsgHasta = 0, hkPremio = false;
+  function hkEnviar() { enviar({ k: "g", dx: hkDx, dz: hkDz }); hkT = performance.now(); }
+  function hkFlecha(id, dx, dz) {
     const b = $(id);
-    const on = (e) => { e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (x) {} b.classList.add("on"); hkDx = dx; hkEnviar(); if (navigator.vibrate) navigator.vibrate(10); };
-    const off = () => { if (!b.classList.contains("on")) return; b.classList.remove("on"); if (hkDx === dx) { hkDx = 0; hkEnviar(); } };
+    const on = (e) => { e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (x) {} b.classList.add("on");
+      if (dx) hkDx = dx; if (dz) hkDz = dz; hkEnviar(); if (navigator.vibrate) navigator.vibrate(10); };
+    const off = () => { if (!b.classList.contains("on")) return; b.classList.remove("on");
+      if (dx && hkDx === dx) hkDx = 0; if (dz && hkDz === dz) hkDz = 0; hkEnviar(); };
     b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off);
     b.addEventListener("pointercancel", off); b.addEventListener("lostpointercapture", off);
     b.addEventListener("contextmenu", (e) => e.preventDefault());
   }
-  hkFlecha("hkl", -1); hkFlecha("hkr", 1);
-  function hkSoltar() { $("hkl").classList.remove("on"); $("hkr").classList.remove("on"); if (hkDx) { hkDx = 0; hkEnviar(); } }
-  setInterval(() => { if (modo === "hook" && hkDx && performance.now() - hkT > 300) hkEnviar(); }, 100);
+  hkFlecha("hkl", -1, 0); hkFlecha("hkr", 1, 0); hkFlecha("hku", 0, 1); hkFlecha("hkd", 0, -1);
+  function hkSoltar() { for (const id of ["hkl", "hkr", "hku", "hkd"]) $(id).classList.remove("on"); if (hkDx || hkDz) { hkDx = hkDz = 0; hkEnviar(); } }
+  setInterval(() => { if (modo === "hook" && (hkDx || hkDz) && performance.now() - hkT > 300) hkEnviar(); }, 100);
   $("hkgo").addEventListener("pointerdown", (e) => {
     e.preventDefault(); if ($("hkgo").disabled) return;
     $("hkgo").classList.add("on"); setTimeout(() => $("hkgo").classList.remove("on"), 160);
@@ -571,11 +581,12 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     $("hkp").textContent = d.pts || 0;
     if (d.est === undefined) {
       $("hkt").textContent = "–"; $("hkgo").disabled = true;
-      if (d.cola) hkMsg(d.cola === 1 ? "¡Eres el siguiente!" : `Turno ${d.cola}º`, "Mira la vitrina: en cuanto quede un gancho libre, es tuyo.");
+      if (d.cola) hkMsg(`<span style="font-size:15px;font-weight:600;letter-spacing:.14em;color:var(--txt2);display:block;margin-bottom:6px">TU PUESTO EN LA COLA</span><span class="hkcola">${d.cola}º<small>de ${d.en_cola || d.cola}</small></span>`,
+                        d.cola === 1 ? `¡Eres el siguiente! Ahora juegan ${d.jugando || 0}.` : `Delante de ti: ${d.cola - 1} · ahora juegan ${d.jugando || 0}`);
       else hkMsg("Esperando…", "Enseguida te toca.");
       hkEst = ""; return;
     }
-    if (d.est !== hkEst && d.est === "mover") { if (navigator.vibrate) navigator.vibrate([40, 40, 40]); hkMsg("¡TE TOCA!", "Mueve el gancho con las flechas y pulsa AGARRAR encima de una bola con el logo.", 1800); }
+    if (d.est !== hkEst && d.est === "mover") { if (navigator.vibrate) navigator.vibrate([40, 40, 40]); hkMsg("¡TE TOCA!", "Muévelo con la cruceta (arriba = hacia el fondo) y pulsa AGARRAR encima de una bola con el logo.", 2000); }
     hkEst = d.est;
     $("hkt").textContent = d.est === "mover" ? d.t : "·";
     $("hkgo").disabled = d.est !== "mover";
@@ -593,6 +604,8 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
       if (navigator.vibrate) navigator.vibrate([100, 60, 100, 60, 400]);
     } else if (e === "escurre") { hkMsg("¡Oh! Se ha escurrido", "Casi… vuelves a la cola para otro intento.", 2500); if (navigator.vibrate) navigator.vibrate(200); }
     else if (e === "nada") hkMsg("No has cogido nada", "Prueba a bajar justo encima de una bola. Vuelves a la cola.", 2500);
+    else if (e === "golpe") { hkMsg("¡Te la han tirado!", "Otro gancho te ha golpeado y se te ha caído la bola.", 2500); if (navigator.vibrate) navigator.vibrate([150, 50, 150]); }
+    else if (e === "has_golpeado") hkMsg("¡Zas!", "Le has tirado la bola a otro jugador.", 1500, false);
     else if (e === "sin_logo") hkMsg("Bola sin logo", "Solo las bolas con el logo tienen premio. ¡Otra vez!", 2500);
   }
 
