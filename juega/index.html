@@ -135,6 +135,42 @@ body.pong #zona{grid-column:1/3}
 #pmsg.on{display:flex}
 #pmsg b{font-size:clamp(34px,10vw,64px);font-weight:600;line-height:1.05}
 #pmsg span{font-size:17px;color:var(--txt2);line-height:1.45}
+/* hook (gancho) */
+#hook{display:none;position:absolute;inset:0;flex-direction:column;gap:12px}
+body.hook #hook{display:flex}
+body.hook #pad, body.hook .acciones, body.hook .girar{display:none}
+.hkhud{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:none}
+.hkhud .c{padding:10px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.hkhud .c small{display:block;font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--txt2)}
+.hkhud .c b{font-size:46px;font-weight:600;line-height:1.05}
+.hkctl{flex:1;display:flex;flex-direction:column;gap:18px;min-height:160px;align-items:stretch}
+.hkflechas{flex:none;height:118px;display:flex;gap:10px}
+.hkflechas button{flex:1;border-radius:24px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--txt);
+  display:flex;align-items:center;justify-content:center;touch-action:none;transition:transform .06s,background .06s}
+.hkflechas button svg{width:56%;max-width:84px;height:auto}
+.hkflechas button.on{background:color-mix(in srgb,var(--col,#ffb042) 35%,transparent);transform:scale(.96);border-color:var(--col,#ffb042)}
+#hkgo{flex:none;width:min(100%,260px);aspect-ratio:1;border-radius:50%;align-self:center;margin:auto 0;border:0;color:#14100a;
+  font:700 clamp(20px,6vw,34px)/1.05 Inter,system-ui,sans-serif;letter-spacing:.05em;touch-action:none;
+  background:radial-gradient(120% 90% at 50% 20%,color-mix(in srgb,var(--col,#ffb042) 100%,#fff 25%),var(--col,#ffb042) 60%,color-mix(in srgb,var(--col,#ffb042) 70%,#000));
+  box-shadow:0 10px 0 color-mix(in srgb,var(--col,#ffb042) 55%,#000),0 20px 50px rgba(0,0,0,.5);transition:transform .06s,box-shadow .06s}
+#hkgo.on{transform:translateY(8px);box-shadow:0 2px 0 color-mix(in srgb,var(--col,#ffb042) 55%,#000),0 0 60px var(--col,#ffb042)}
+#hkgo:disabled{opacity:.35;filter:grayscale(.6)}
+#hkmsg{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  background:rgba(8,9,12,.86);text-align:center;padding:0 24px;z-index:2;border-radius:18px;pointer-events:none}
+#hkmsg.on{display:flex}
+#hkmsg b{font-size:clamp(34px,11vw,70px);font-weight:600;line-height:1.05}
+#hkmsg span{font-size:17px;color:var(--txt2);line-height:1.45}
+#hkmsg .codigo{font:700 clamp(40px,14vw,84px)/1 ui-monospace,Menlo,monospace;letter-spacing:.12em;color:var(--col,#ffb042);
+  padding:10px 20px;border:2px dashed var(--col,#ffb042);border-radius:16px}
+#hkmsg.premio{background:rgba(8,9,12,.94);pointer-events:auto}
+@media (orientation:landscape) and (max-height:560px){
+  body.hook{grid-template-columns:1fr}
+  body.hook .info,body.hook #zona{grid-column:1}
+  .hkhud .c b{font-size:34px}
+  .hkctl{flex-direction:row}
+  .hkflechas{flex:1;height:auto}
+  #hkgo{width:auto;height:100%;max-height:220px;margin:0}
+}
 /* carreras */
 #carr{display:none;position:absolute;inset:0;flex-direction:column;gap:12px}
 body.carr #carr{display:flex}
@@ -209,6 +245,16 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     <div class="vidbox" id="vidbox"><video id="vid" playsinline muted preload="auto"></video>
       <div class="vidbar"><button id="vidsnd">Activar sonido</button><button id="vidver">Ocultar vídeo</button></div></div>
     <div class="notas" id="notas"><div class="vacio">Aquí irán apareciendo curiosidades mientras ves la historia.</div></div>
+  </div>
+  <div id="hook">
+    <div class="hkhud"><div class="c"><small>TIEMPO</small><b id="hkt">–</b></div>
+      <div class="c"><small>PREMIOS</small><b id="hkp">0</b></div></div>
+    <div class="hkctl">
+      <div class="hkflechas"><button id="hkl" aria-label="Mover a la izquierda"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="hkr" aria-label="Mover a la derecha"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5 L16 12 L9 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <button id="hkgo">¡AGARRAR!</button>
+    </div>
+    <div id="hkmsg" class="on"><b id="hkmt">Esperando…</b><span id="hkmx"></span></div>
   </div>
   <div id="carr">
     <div class="chud"><div class="c"><small>VUELTA</small><b id="cvu">–<em>/3</em></b></div>
@@ -363,6 +409,8 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     if (d.pts !== undefined) marcador(d);
     if (d.pg) estadoPong(d.pg);
     if (d.cr) estadoCarr(d.cr);
+    if (d.hk) estadoHook(d.hk);
+    if (d.hk_evt) eventoHook(d);
     if (d.cr_evt === "fuera") { if (navigator.vibrate) navigator.vibrate([90, 60, 220]); cMsg("¡FUERA!", "Ibas muy rápido en la curva. Vuelves a la pista en un momento…", true, 2200); }
   });
   $("avbtn").onclick = () => location.reload();
@@ -492,6 +540,62 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
   if (typeof DeviceMotionEvent === "undefined") $("agitar").style.display = "none";
   document.addEventListener("gesturestart", (e) => e.preventDefault());
 
+  // =========================================================== JUEGO: HOOK (gancho)
+  let hkDx = 0, hkT = 0, hkEst = "", hkMsgHasta = 0, hkPremio = false;
+  function hkEnviar() { enviar({ k: "g", dx: hkDx }); hkT = performance.now(); }
+  function hkFlecha(id, dx) {
+    const b = $(id);
+    const on = (e) => { e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (x) {} b.classList.add("on"); hkDx = dx; hkEnviar(); if (navigator.vibrate) navigator.vibrate(10); };
+    const off = () => { if (!b.classList.contains("on")) return; b.classList.remove("on"); if (hkDx === dx) { hkDx = 0; hkEnviar(); } };
+    b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off);
+    b.addEventListener("pointercancel", off); b.addEventListener("lostpointercapture", off);
+    b.addEventListener("contextmenu", (e) => e.preventDefault());
+  }
+  hkFlecha("hkl", -1); hkFlecha("hkr", 1);
+  function hkSoltar() { $("hkl").classList.remove("on"); $("hkr").classList.remove("on"); if (hkDx) { hkDx = 0; hkEnviar(); } }
+  setInterval(() => { if (modo === "hook" && hkDx && performance.now() - hkT > 300) hkEnviar(); }, 100);
+  $("hkgo").addEventListener("pointerdown", (e) => {
+    e.preventDefault(); if ($("hkgo").disabled) return;
+    $("hkgo").classList.add("on"); setTimeout(() => $("hkgo").classList.remove("on"), 160);
+    hkSoltar(); enviar({ k: "g", go: 1 }); if (navigator.vibrate) navigator.vibrate(40);
+  });
+  function hkMsg(tit, txt, ms, premio) {
+    if (hkPremio && !premio) return;                 // el código del premio se queda hasta que se toque
+    $("hkmt").innerHTML = tit; $("hkmx").innerHTML = txt || "";
+    $("hkmsg").classList.add("on"); $("hkmsg").classList.toggle("premio", !!premio);
+    hkMsgHasta = ms ? Date.now() + ms : 0;
+  }
+  function hkSinMsg() { if (!hkPremio && Date.now() > hkMsgHasta) $("hkmsg").classList.remove("on"); }
+  $("hkmsg").addEventListener("click", () => { if (hkPremio) { hkPremio = false; $("hkmsg").classList.remove("on", "premio"); } });
+  function estadoHook(d) {
+    $("hkp").textContent = d.pts || 0;
+    if (d.est === undefined) {
+      $("hkt").textContent = "–"; $("hkgo").disabled = true;
+      if (d.cola) hkMsg(d.cola === 1 ? "¡Eres el siguiente!" : `Turno ${d.cola}º`, "Mira la vitrina: en cuanto quede un gancho libre, es tuyo.");
+      else hkMsg("Esperando…", "Enseguida te toca.");
+      hkEst = ""; return;
+    }
+    if (d.est !== hkEst && d.est === "mover") { if (navigator.vibrate) navigator.vibrate([40, 40, 40]); hkMsg("¡TE TOCA!", "Mueve el gancho con las flechas y pulsa AGARRAR encima de una bola con el logo.", 1800); }
+    hkEst = d.est;
+    $("hkt").textContent = d.est === "mover" ? d.t : "·";
+    $("hkgo").disabled = d.est !== "mover";
+    if (d.est === "mover") hkSinMsg();
+    else if (d.est === "baja" || d.est === "cierra") hkMsg("Bajando…", "", 0);
+    else if (d.est === "sube" || d.est === "lleva" || d.est === "suelta")
+      hkMsg(d.lleva ? (d.logo ? "¡Tienes una bola con logo!" : "¡Tienes una bola!") : "Subiendo…", d.lleva ? "Que no se escurra…" : "", 0);
+  }
+  function eventoHook(d) {
+    const e = d.hk_evt;
+    if (e === "premio") {
+      hkPremio = false;
+      hkMsg("¡PREMIO! 🎁", `<span style="display:block;margin-bottom:12px">Enseña este código para recoger tu regalo:</span><span class="codigo">${d.codigo}</span>`, 0, true);
+      hkPremio = true;
+      if (navigator.vibrate) navigator.vibrate([100, 60, 100, 60, 400]);
+    } else if (e === "escurre") { hkMsg("¡Oh! Se ha escurrido", "Casi… vuelves a la cola para otro intento.", 2500); if (navigator.vibrate) navigator.vibrate(200); }
+    else if (e === "nada") hkMsg("No has cogido nada", "Prueba a bajar justo encima de una bola. Vuelves a la cola.", 2500);
+    else if (e === "sin_logo") hkMsg("Bola sin logo", "Solo las bolas con el logo tienen premio. ¡Otra vez!", 2500);
+  }
+
   // =========================================================== JUEGO: CARRERAS (mantener para acelerar)
   let gasOn = false, gasDedo = null, tGas = 0, cEst = "", cMsgHasta = 0, cDerAntes = 0;
   const gasBtn = $("gas");
@@ -567,6 +671,8 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     document.body.classList.toggle("pong", m === "pong");
     document.body.classList.toggle("capi", m === "capitulos");
     document.body.classList.toggle("carr", m === "carreras");
+    document.body.classList.toggle("hook", m === "hook");
+    if (m !== "hook") hkSoltar();
     if (m !== "carreras") soltarGas();
     if (m !== "capitulos") { try { $("vid").pause(); } catch (e) {} }
     if (m !== "pong") $("pmsg").classList.remove("on");
