@@ -255,7 +255,7 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
   </div>
   <div id="hook">
     <div class="hkhud"><div class="c"><small>TIEMPO</small><b id="hkt">–</b></div>
-      <div class="c"><small>PREMIOS</small><b id="hkp">0</b></div></div>
+      <div class="c"><small>PUNTOS</small><b id="hkp">0</b></div></div>
     <div id="hkcod" class="hkcod" hidden>🎁 Tu código: <b></b></div>
     <div class="hkctl">
       <div class="hkcruz">
@@ -606,11 +606,20 @@ body.carr #pad, body.carr .acciones, body.carr .girar{display:none}
     const e = d.hk_evt;
     if (e === "premio") {
       hkPremio = false;
-      hkMsg("¡PREMIO! 🎁", `<span style="display:block;margin-bottom:12px">Enseña este código para recoger tu regalo:</span><span class="codigo">${d.codigo}</span><span style="display:block;margin-top:14px;font-size:14px">Toca para seguir jugando · el código queda guardado arriba</span>`, 0, true);
+      hkMsg(d.dorada ? "¡BOLA DORADA! 🏆" : "¡PREMIO! 🎁", `<span style="display:block;margin-bottom:12px">${d.dorada ? "¡Premio especial! " : ""}Enseña este código para recoger tu regalo:</span><span class="codigo">${d.codigo}</span><span style="display:block;margin-top:14px;font-size:14px">Toca para seguir jugando · el código queda guardado arriba</span>`, 0, true);
       hkPremio = true;
       const cod = $("hkcod"); cod.hidden = false;
       cod.querySelector("b").textContent = (cod.querySelector("b").textContent ? cod.querySelector("b").textContent + " · " : "") + d.codigo;
-      if (navigator.vibrate) navigator.vibrate([100, 60, 100, 60, 400]);
+      if (navigator.vibrate) navigator.vibrate(d.dorada ? [100, 50, 100, 50, 100, 50, 600] : [100, 60, 100, 60, 400]);
+      if (d.pts != null) $("hkp").textContent = d.pts;
+    } else if (e === "punto") {
+      if (d.pts != null) $("hkp").textContent = d.pts;
+      hkMsg("+1 punto", "¡Bien metida! Sigue intentándolo: las bolas con el logo tienen premio.", 1800, false);
+      if (navigator.vibrate) navigator.vibrate(40);
+    } else if (e === "tiembla") {
+      if (navigator.vibrate) navigator.vibrate([60, 40, 60, 40, 60, 40, 60]);    // aviso: ¡se puede caer!
+    } else if (e === "ya_ganaste") {
+      hkMsg("¡Ya ganaste hoy!", "Cada móvil puede llevarse un premio al día. Esta cuenta como punto.", 3500);
     } else if (e === "escurre") { hkMsg("¡Oh! Se ha escurrido", "Casi… vuelves a la cola para otro intento.", 2500); if (navigator.vibrate) navigator.vibrate(200); }
     else if (e === "nada") hkMsg("No has cogido nada", "Prueba a bajar justo encima de una bola. Vuelves a la cola.", 2500);
     else if (e === "golpe") { hkMsg("¡Te la han tirado!", "Otro gancho te ha golpeado y se te ha caído la bola.", 2500); if (navigator.vibrate) navigator.vibrate([150, 50, 150]); }
